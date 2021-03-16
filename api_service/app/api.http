@@ -1,0 +1,26 @@
+POST http://localhost:8080/api/auth
+Content-Type: application/json
+
+{
+  "username": "me",
+  "password": "pass"
+}
+
+> {% client.log(response.body.token);
+client.global.set("auth_token", response.body.token)
+%}
+
+###
+
+
+GET http://localhost:8080/api/heartbeat
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+###
+
+GET http://localhost:8080/api/test
+Accept: application/json
+
+###
+
