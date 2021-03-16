@@ -19,8 +19,3 @@ Authorization: Bearer {{auth_token}}
 
 ###
 
-GET http://localhost:8080/api/test
-Accept: application/json
-
-###
-

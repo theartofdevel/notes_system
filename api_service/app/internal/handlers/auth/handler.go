@@ -3,7 +3,9 @@ package auth
 import (
 	"encoding/json"
 	"github.com/cristalhq/jwt/v3"
+	"github.com/julienschmidt/httprouter"
 	"github.com/theartofdevel/notes_system/api_service/internal/config"
+	"github.com/theartofdevel/notes_system/api_service/pkg/cache"
 	"github.com/theartofdevel/notes_system/api_service/pkg/logging"
 	jwt2 "github.com/theartofdevel/notes_system/api_service/pkg/middleware/jwt"
 	"net/http"
@@ -19,10 +21,19 @@ type user struct {
 	Password string `json:"password"`
 }
 
-func Auth(w http.ResponseWriter, r *http.Request) {
+type Handler struct {
+	Logger logging.Logger
+	RTCache cache.Repository
+}
+
+func (h *Handler) Register(router *httprouter.Router) {
+	router.HandlerFunc(http.MethodPost, URL, h.Auth)
+}
+
+func (h *Handler) Auth(w http.ResponseWriter, r *http.Request) {
 	var u user
 	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
-		logging.GetLogger().Fatal(err)
+		h.Logger.Fatal(err)
 	}
 
 	defer r.Body.Close()
@@ -52,7 +63,7 @@ func Auth(w http.ResponseWriter, r *http.Request) {
 	}
 	token, err := builder.Build(claims)
 	if err != nil {
-		logging.GetLogger().Error(err)
+		h.Logger.Error(err)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
