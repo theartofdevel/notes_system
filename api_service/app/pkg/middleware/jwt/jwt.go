@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/cristalhq/jwt/v3"
-	"github.com/theartofdevel/notes_system/api_service/internal/app_context"
+	"github.com/theartofdevel/notes_system/api_service/internal/config"
 	"github.com/theartofdevel/notes_system/api_service/pkg/logging"
 	"net/http"
 	"strings"
@@ -28,7 +28,7 @@ func JWTMiddleware(h http.HandlerFunc) http.HandlerFunc {
 		}
 		logger.Debug("create jwt verifier")
 		jwtToken := authHeader[1]
-		key := []byte(app_context.GetInstance().Config.JWT.Secret)
+		key := []byte(config.GetConfig().JWT.Secret)
 		verifier, err := jwt.NewVerifierHS(jwt.HS256, key)
 		if err != nil {
 			unauthorized(w, err)

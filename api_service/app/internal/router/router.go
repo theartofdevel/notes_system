@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
-	"github.com/theartofdevel/notes_system/api_service/internal/app_context"
 	"github.com/theartofdevel/notes_system/api_service/internal/auth"
+	"github.com/theartofdevel/notes_system/api_service/internal/config"
 	"github.com/theartofdevel/notes_system/api_service/pkg/logging"
 	"github.com/theartofdevel/notes_system/api_service/pkg/metric"
 	"github.com/theartofdevel/notes_system/api_service/pkg/middleware/jwt"
@@ -31,8 +31,7 @@ func Init() {
 	router.HandlerFunc("GET", metric.HEARTBEAT_URL, jwt.JWTMiddleware(metric.Heartbeat))
 	router.HandlerFunc("GET", metric.TEST_URL, metric.Test)
 
-	ctx := app_context.GetInstance()
-	cfg := ctx.Config
+	cfg := config.GetConfig()
 
 	var server *http.Server
 	var listener net.Listener

@@ -3,7 +3,7 @@ package auth
 import (
 	"encoding/json"
 	"github.com/cristalhq/jwt/v3"
-	"github.com/theartofdevel/notes_system/api_service/internal/app_context"
+	"github.com/theartofdevel/notes_system/api_service/internal/config"
 	"github.com/theartofdevel/notes_system/api_service/pkg/logging"
 	jwt2 "github.com/theartofdevel/notes_system/api_service/pkg/middleware/jwt"
 	"net/http"
@@ -33,7 +33,7 @@ func Auth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	key := []byte(app_context.GetInstance().Config.JWT.Secret)
+	key := []byte(config.GetConfig().JWT.Secret)
 	signer, err := jwt.NewSignerHS(jwt.HS256, key)
 	if err != nil {
 		w.WriteHeader(418)
