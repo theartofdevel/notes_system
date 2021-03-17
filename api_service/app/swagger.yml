@@ -1,0 +1,433 @@
+openapi: 3.0.0
+info:
+  title: Note System API
+  version: 0.0.1
+
+tags:
+  - name: Notes
+    description: "Notes - main entity"
+  - name: Categories
+    description: "Categories for notes"
+  - name: Authorization
+components:
+  headers:
+    RequestSuccess:
+      schema:
+        type: string
+      description: "if the application has successfully processed the request, it returns success. If an error occurs during the processing of the request, it returns fail."
+
+  responses:
+    minimalResponse:
+      description: "OK"
+
+    minimalResponseWithHeader:
+      headers:
+        X-Request-Success:
+          schema:
+            type: string
+          description: "if the application has successfully processed the request, it returns success. If an error occurs during the processing of the request, it returns fail."
+      description: "OK"
+
+    NotFound:
+      description: Not Found
+      headers:
+        X-Request-Success:
+          schema:
+            type: boolean
+          description: "false"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    BadRequest:
+      description: Bad Request
+      headers:
+        X-Request-Success:
+          schema:
+            type: boolean
+          description: "false"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    Unauthorized:
+      description: Unauthorized
+      headers:
+        X-Request-Success:
+          schema:
+            type: boolean
+          description: "false"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    Conflict:
+      description: Resource Already Exist
+      headers:
+        X-Request-Success:
+          schema:
+            type: boolean
+          description: "false"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    ImaTeapot:
+      description: Code Execution Error
+      headers:
+        X-Request-Success:
+          schema:
+            type: boolean
+          description: "false"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    InternalError:
+      description: Internal Server Error
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error_code:
+          type: string
+        developer_message:
+          type: string
+      required:
+        - error_code
+        - message
+        - developer_message
+
+    Note:
+      type: object
+      properties:
+        uuid:
+          type: string
+          readOnly: true
+        header:
+          type: string
+        body:
+          type: string
+        created_date:
+          type: integer
+        category:
+          $ref: "#/components/schemas/Category"
+
+    CreateNote:
+      type: object
+      properties:
+        header:
+          type: string
+        body:
+          type: string
+        category_id:
+          type: integer
+
+    Category:
+      type: object
+      properties:
+        id:
+          type: string
+        parent_id:
+          type: integer
+        name:
+          type: string
+        color:
+          type: string
+
+    CreateCategory:
+      allOf:
+        - $ref: "#/components/schemas/Category"
+        - required:
+            - name
+            - color
+
+    Token:
+      type: object
+      properties:
+        token:
+          type: string
+        refresh_token:
+          type: string
+
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+
+    CreateUser:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        email:
+          type: string
+
+paths:
+  /api/auth:
+    post:
+      summary: "auth by username and password and get access and refresh tokens"
+      tags:
+        - Authorization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      description: "Авторизация пользователя, получение токена доступа к методам API"
+      responses:
+        '200':
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Token"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '418':
+          $ref: "#/components/responses/ImaTeapot"
+        '500':
+          $ref: "#/components/responses/InternalError"
+    put:
+      summary: "get access using refresh token"
+      tags:
+        - Authorization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/Token"
+                - required:
+                    - refresh_token
+      description: "Авторизация пользователя, обмен refresh_token на access_token для доступа к методам API"
+      responses:
+        '201':
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Token"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '418':
+          $ref: "#/components/responses/ImaTeapot"
+        '500':
+          $ref: "#/components/responses/InternalError"
+  /api/users:
+    post:
+      summary: "create new user"
+      tags:
+        - Authorization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/CreateUser"
+      description: "Авторизация пользователя, получение токена доступа к методам API"
+      responses:
+        '201':
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Token"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '418':
+          $ref: "#/components/responses/ImaTeapot"
+        '500':
+          $ref: "#/components/responses/InternalError"
+  /api/categories:
+    get:
+      summary: "get all categories"
+      tags:
+        - Categories
+      description: "Получение информации о всех категориях пользователя"
+      responses:
+        '200':
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Note"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '418':
+          $ref: "#/components/responses/ImaTeapot"
+        '500':
+          $ref: "#/components/responses/InternalError"
+    post:
+      summary: "create category"
+      tags:
+        - Categories
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCategory"
+      description: "Создание новой категории"
+      responses:
+        '201':
+          headers:
+            Location:
+              schema:
+                type: string
+              description: uri of new object
+            X-Request-Success:
+              schema:
+                type: boolean
+              description: "true"
+          description: 'Created'
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '409':
+          $ref: "#/components/responses/Conflict"
+        '418':
+          $ref: "#/components/responses/ImaTeapot"
+        '500':
+          $ref: "#/components/responses/InternalError"
+  /api/notes:
+    get:
+      summary: "get all notes"
+      tags:
+        - Notes
+      description: "Получение всех заметок"
+      responses:
+        '200':
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Note"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '418':
+          $ref: "#/components/responses/ImaTeapot"
+        '500':
+          $ref: "#/components/responses/InternalError"
+    post:
+      summary: "create note"
+      tags:
+        - Notes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateNote"
+      description: "Создание новой заметки"
+      responses:
+        '201':
+          headers:
+            Location:
+              schema:
+                type: string
+              description: uri of new object
+            X-Request-Success:
+              schema:
+                type: boolean
+              description: "true"
+          description: 'Created'
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '409':
+          $ref: "#/components/responses/Conflict"
+        '418':
+          $ref: "#/components/responses/ImaTeapot"
+        '500':
+          $ref: "#/components/responses/InternalError"
+  /api/notes/{uuid}:
+    get:
+      summary: "get note by uuid"
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+      tags:
+        - Notes
+      description: "Получение заметки"
+      responses:
+        '200':
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Note"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '418':
+          $ref: "#/components/responses/ImaTeapot"
+        '500':
+          $ref: "#/components/responses/InternalError"
+    patch:
+      summary: "update note by uuid"
+      tags:
+        - Notes
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+      description: "Обновления существующей заметки по uuid"
+      responses:
+        '204':
+          headers:
+            X-Request-Success:
+              schema:
+                type: boolean
+              description: "true"
+          description: "No Content"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '404':
+          $ref: "#/components/responses/NotFound"
+        '418':
+          $ref: "#/components/responses/ImaTeapot"
+        '500':
+          $ref: "#/components/responses/InternalError"
+    delete:
+      summary: "delete note by uuid"
+      tags:
+        - Notes
+      description: "Удаление заметки по uuid"
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: "No Content"
+        '404':
+          $ref: "#/components/responses/NotFound"
+        '418':
+          $ref: "#/components/responses/ImaTeapot"
+        '500':
+          $ref: "#/components/responses/InternalError"
