@@ -14,12 +14,18 @@ import (
 )
 
 const (
-	URL = "/api/auth"
+	authURL = "/api/auth"
+	signupURL = "/api/signup"
 )
 
 type user struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
+}
+
+type newUser struct {
+	user
+	Email string `json:"email"`
 }
 
 type refresh struct {
@@ -32,8 +38,32 @@ type Handler struct {
 }
 
 func (h *Handler) Register(router *httprouter.Router) {
-	router.HandlerFunc(http.MethodPost, URL, h.Auth)
-	router.HandlerFunc(http.MethodPut, URL, h.Auth)
+	router.HandlerFunc(http.MethodPost, authURL, h.Auth)
+	router.HandlerFunc(http.MethodPut, authURL, h.Auth)
+	router.HandlerFunc(http.MethodPost, signupURL, h.Signup)
+}
+
+func (h *Handler) Signup(w http.ResponseWriter, r *http.Request) {
+	var nu newUser
+	if err := json.NewDecoder(r.Body).Decode(&nu); err != nil {
+		h.Logger.Error(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	defer r.Body.Close()
+
+	// TODO validate username and password
+	// TODO create user using UserService
+	jsonBytes, errCode := h.generateAccessToken(w)
+	if errCode != 0 {
+		w.WriteHeader(errCode)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	w.Write(jsonBytes)
 }
 
 func (h *Handler) Auth(w http.ResponseWriter, r *http.Request) {
@@ -72,11 +102,21 @@ func (h *Handler) Auth(w http.ResponseWriter, r *http.Request) {
 		// TODO client to UserService and get user by username
 	}
 
+	jsonBytes, errCode := h.generateAccessToken(w)
+	if errCode != 0 {
+		w.WriteHeader(errCode)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	w.Write(jsonBytes)
+}
+
+func (h *Handler) generateAccessToken(w http.ResponseWriter) ([]byte, int) {
 	key := []byte(config.GetConfig().JWT.Secret)
 	signer, err := jwt.NewSignerHS(jwt.HS256, key)
 	if err != nil {
-		w.WriteHeader(418)
-		return
+		return nil, 418
 	}
 	builder := jwt.NewBuilder(signer)
 
@@ -92,8 +132,7 @@ func (h *Handler) Auth(w http.ResponseWriter, r *http.Request) {
 	token, err := builder.Build(claims)
 	if err != nil {
 		h.Logger.Error(err)
-		w.WriteHeader(http.StatusUnauthorized)
-		return
+		return nil, http.StatusUnauthorized
 	}
 
 	h.Logger.Info("create refresh token")
@@ -101,8 +140,7 @@ func (h *Handler) Auth(w http.ResponseWriter, r *http.Request) {
 	err = h.RTCache.Set([]byte(refreshTokenUuid.String()), []byte("user_uuid"), 0)
 	if err != nil {
 		h.Logger.Error(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+		return nil, http.StatusInternalServerError
 	}
 
 	jsonBytes, err := json.Marshal(map[string]string{
@@ -110,11 +148,8 @@ func (h *Handler) Auth(w http.ResponseWriter, r *http.Request) {
 		"refresh_token": refreshTokenUuid.String(),
 	})
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+		return nil, http.StatusInternalServerError
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonBytes)
-	w.WriteHeader(200)
+	return jsonBytes, 0
 }
