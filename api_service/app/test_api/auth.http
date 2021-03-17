@@ -13,10 +13,19 @@ client.global.set("refresh_token", response.body.refresh_token)
 
 ###
 
+POST http://localhost:8080/api/signup
+Content-Type: application/json
 
-GET http://localhost:8080/api/heartbeat
-Accept: application/json
-Authorization: Bearer {{auth_token}}
+{
+  "username": "me",
+  "password": "pass",
+  "email": "email@me.here"
+}
+
+> {%
+client.global.set("auth_token", response.body.token)
+client.global.set("refresh_token", response.body.refresh_token)
+%}
 
 ###
 
@@ -32,18 +41,3 @@ client.global.set("auth_token", response.body.token)
 client.global.set("refresh_token", response.body.refresh_token)
 %}
 
-###
-
-POST http://localhost:8080/api/signup
-Content-Type: application/json
-
-{
-  "username": "me",
-  "password": "pass",
-  "email": "email@me.here"
-}
-
-> {%
-client.global.set("auth_token", response.body.token)
-client.global.set("refresh_token", response.body.refresh_token)
-%}

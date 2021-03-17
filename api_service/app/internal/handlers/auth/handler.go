@@ -55,7 +55,7 @@ func (h *Handler) Signup(w http.ResponseWriter, r *http.Request) {
 
 	// TODO validate username and password
 	// TODO create user using UserService
-	jsonBytes, errCode := h.generateAccessToken(w)
+	jsonBytes, errCode := h.generateAccessToken()
 	if errCode != 0 {
 		w.WriteHeader(errCode)
 		return
@@ -102,7 +102,7 @@ func (h *Handler) Auth(w http.ResponseWriter, r *http.Request) {
 		// TODO client to UserService and get user by username
 	}
 
-	jsonBytes, errCode := h.generateAccessToken(w)
+	jsonBytes, errCode := h.generateAccessToken()
 	if errCode != 0 {
 		w.WriteHeader(errCode)
 		return
@@ -112,7 +112,7 @@ func (h *Handler) Auth(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonBytes)
 }
 
-func (h *Handler) generateAccessToken(w http.ResponseWriter) ([]byte, int) {
+func (h *Handler) generateAccessToken() ([]byte, int) {
 	key := []byte(config.GetConfig().JWT.Secret)
 	signer, err := jwt.NewSignerHS(jwt.HS256, key)
 	if err != nil {
@@ -125,7 +125,7 @@ func (h *Handler) generateAccessToken(w http.ResponseWriter) ([]byte, int) {
 		RegisteredClaims: jwt.RegisteredClaims{
 			ID:        "uuid_here",
 			Audience:  []string{"users"},
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * 5)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 60)),
 		},
 		Email: "email@will.be.here",
 	}

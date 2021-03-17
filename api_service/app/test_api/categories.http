@@ -1,0 +1,33 @@
+GET http://localhost:8080/api/categories
+Accept: application/json
+Authorization: Bearer {{auth_token}}
+
+###
+
+POST http://localhost:8080/api/categories
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "name": "me",
+  "color": "pass",
+  "parent_id": "5"
+}
+
+###
+
+PATCH http://localhost:8080/api/categories/3
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "name": "me",
+  "color": "pass",
+  "parent_id": "5"
+}
+
+###
+
+DELETE http://localhost:8080/api/categories/5
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}

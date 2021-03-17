@@ -6,6 +6,8 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/theartofdevel/notes_system/api_service/internal/config"
 	"github.com/theartofdevel/notes_system/api_service/internal/handlers/auth"
+	"github.com/theartofdevel/notes_system/api_service/internal/handlers/categories"
+	"github.com/theartofdevel/notes_system/api_service/internal/handlers/notes"
 	"github.com/theartofdevel/notes_system/api_service/pkg/cache/freecache"
 	"github.com/theartofdevel/notes_system/api_service/pkg/handlers/metric"
 	"github.com/theartofdevel/notes_system/api_service/pkg/logging"
@@ -39,6 +41,12 @@ func main() {
 
 	metricHandler := metric.Handler{Logger: logger}
 	metricHandler.Register(router)
+
+	categoriesHandler := categories.Handler{Logger: logger}
+	categoriesHandler.Register(router)
+
+	notesHandler := notes.Handler{Logger: logger}
+	notesHandler.Register(router)
 
 	logger.Println("start application")
 	start(router, logger, cfg)

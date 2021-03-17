@@ -20,21 +20,8 @@ components:
     minimalResponse:
       description: "OK"
 
-    minimalResponseWithHeader:
-      headers:
-        X-Request-Success:
-          schema:
-            type: string
-          description: "if the application has successfully processed the request, it returns success. If an error occurs during the processing of the request, it returns fail."
-      description: "OK"
-
     NotFound:
       description: Not Found
-      headers:
-        X-Request-Success:
-          schema:
-            type: boolean
-          description: "false"
       content:
         application/json:
           schema:
@@ -42,11 +29,6 @@ components:
 
     BadRequest:
       description: Bad Request
-      headers:
-        X-Request-Success:
-          schema:
-            type: boolean
-          description: "false"
       content:
         application/json:
           schema:
@@ -54,11 +36,6 @@ components:
 
     Unauthorized:
       description: Unauthorized
-      headers:
-        X-Request-Success:
-          schema:
-            type: boolean
-          description: "false"
       content:
         application/json:
           schema:
@@ -66,11 +43,6 @@ components:
 
     Conflict:
       description: Resource Already Exist
-      headers:
-        X-Request-Success:
-          schema:
-            type: boolean
-          description: "false"
       content:
         application/json:
           schema:
@@ -78,11 +50,6 @@ components:
 
     ImaTeapot:
       description: Code Execution Error
-      headers:
-        X-Request-Success:
-          schema:
-            type: boolean
-          description: "false"
       content:
         application/json:
           schema:
@@ -116,8 +83,8 @@ components:
           type: string
         created_date:
           type: integer
-        category:
-          $ref: "#/components/schemas/Category"
+        category_id:
+          type: string
 
     CreateNote:
       type: object
@@ -127,7 +94,7 @@ components:
         body:
           type: string
         category_id:
-          type: integer
+          type: string
 
     Category:
       type: object
@@ -135,7 +102,7 @@ components:
         id:
           type: string
         parent_id:
-          type: integer
+          type: string
         name:
           type: string
         color:
@@ -231,7 +198,7 @@ paths:
           $ref: "#/components/responses/ImaTeapot"
         '500':
           $ref: "#/components/responses/InternalError"
-  /api/users:
+  /api/signup:
     post:
       summary: "create new user"
       tags:
@@ -264,14 +231,14 @@ paths:
       summary: "get all categories"
       tags:
         - Categories
-      description: "Получение информации о всех категориях пользователя"
+      description: "Получение всех категорий"
       responses:
         '200':
           description: "OK"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Note"
+                $ref: "#/components/schemas/Category"
         '400':
           $ref: "#/components/responses/BadRequest"
         '418':
@@ -296,15 +263,60 @@ paths:
               schema:
                 type: string
               description: uri of new object
-            X-Request-Success:
-              schema:
-                type: boolean
-              description: "true"
           description: 'Created'
         '400':
           $ref: "#/components/responses/BadRequest"
         '409':
           $ref: "#/components/responses/Conflict"
+        '418':
+          $ref: "#/components/responses/ImaTeapot"
+        '500':
+          $ref: "#/components/responses/InternalError"
+  /api/categories/{id}:
+    patch:
+      summary: "partially update category"
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+      tags:
+        - Categories
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Category"
+      description: "Частично обновление категории (можно обновить не все поля)"
+      responses:
+        '204':
+          description: 'No Content'
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '409':
+          $ref: "#/components/responses/Conflict"
+        '418':
+          $ref: "#/components/responses/ImaTeapot"
+        '500':
+          $ref: "#/components/responses/InternalError"
+    delete:
+      summary: "delete category by id"
+      tags:
+        - Categories
+      description: "Удаление категории по uuid"
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: "No Content"
+        '404':
+          $ref: "#/components/responses/NotFound"
         '418':
           $ref: "#/components/responses/ImaTeapot"
         '500':
@@ -346,10 +358,6 @@ paths:
               schema:
                 type: string
               description: uri of new object
-            X-Request-Success:
-              schema:
-                type: boolean
-              description: "true"
           description: 'Created'
         '400':
           $ref: "#/components/responses/BadRequest"
@@ -385,9 +393,15 @@ paths:
         '500':
           $ref: "#/components/responses/InternalError"
     patch:
-      summary: "update note by uuid"
+      summary: "partially update note by uuid"
       tags:
         - Notes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Note"
       parameters:
         - in: path
           name: uuid
@@ -397,11 +411,6 @@ paths:
       description: "Обновления существующей заметки по uuid"
       responses:
         '204':
-          headers:
-            X-Request-Success:
-              schema:
-                type: boolean
-              description: "true"
           description: "No Content"
         '400':
           $ref: "#/components/responses/BadRequest"
