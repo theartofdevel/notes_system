@@ -6,8 +6,9 @@ Content-Type: application/json
   "password": "pass"
 }
 
-> {% client.log(response.body.token);
+> {%
 client.global.set("auth_token", response.body.token)
+client.global.set("refresh_token", response.body.refresh_token)
 %}
 
 ###
@@ -19,3 +20,14 @@ Authorization: Bearer {{auth_token}}
 
 ###
 
+PUT http://localhost:8080/api/auth
+Content-Type: application/json
+
+{
+  "refresh_token": "{{refresh_token}}"
+}
+
+> {%
+client.global.set("auth_token", response.body.token)
+client.global.set("refresh_token", response.body.refresh_token)
+%}
