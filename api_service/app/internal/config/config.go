@@ -16,6 +16,9 @@ type Config struct {
 		BindIP string `yaml:"bind_ip" env-default:"localhost"`
 		Port   string `yaml:"port" env-default:"8080"`
 	}
+	CategoryService struct {
+		URL string `yaml:"url" env-required:"true"`
+	} `yaml:"category_service" env-required:"true"`
 }
 
 var instance *Config

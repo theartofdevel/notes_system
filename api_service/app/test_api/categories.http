@@ -2,32 +2,41 @@ GET http://localhost:8080/api/categories
 Accept: application/json
 Authorization: Bearer {{auth_token}}
 
-###
+### Create root category
 
 POST http://localhost:8080/api/categories
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-  "name": "me",
-  "color": "pass",
-  "parent_id": "5"
+  "name": "category from api"
 }
 
-###
+### Create sub category
 
-PATCH http://localhost:8080/api/categories/3
+POST http://localhost:8080/api/categories
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-  "name": "me",
-  "color": "pass",
-  "parent_id": "5"
+  "name": "again and again",
+  "parent_uuid": "2a0385f4-a8cd-4a18-8783-e6a1a420dcc8"
+}
+
+
+###
+
+PATCH http://localhost:8080/api/categories/33d79ffa-c60f-4681-9a15-de09c753af73
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "name": "patched category",
+  "parent_id": "2a0385f4-a8cd-4a18-8783-e6a1a420dcc8"
 }
 
 ###
 
-DELETE http://localhost:8080/api/categories/5
+DELETE http://localhost:8080/api/categories/2a0385f4-a8cd-4a18-8783-e6a1a420dcc8
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}

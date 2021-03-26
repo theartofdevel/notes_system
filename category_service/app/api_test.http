@@ -1,0 +1,46 @@
+GET http://localhost:5000/api/categories?user_uuid=77803c1a-8c1a-492a-89be-f219735b2aef
+Accept: application/json
+
+### Create root category
+
+POST http://localhost:5000/api/categories
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "New category",
+  "user_uuid": "77803c1a-8c1a-492a-89be-f219735b2aef"
+}
+
+### Create sub category
+
+POST http://localhost:5000/api/categories
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "New category",
+  "user_uuid": "77803c1a-8c1a-492a-89be-f219735b2aef",
+  "parent_uuid": "c2ae415d-77a3-466b-8435-7022d1684e8e"
+}
+
+### Update category
+
+PATCH http://localhost:5000/api/categories/00e9e849-1a82-46bc-b104-12cc61abd757
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "changed category name",
+  "user_uuid": "77803c1a-8c1a-492a-89be-f219735b2aef"
+}
+
+### Delete category
+
+DELETE http://localhost:5000/api/categories/00e9e849-1a82-46bc-b104-12cc61abd757
+Accept: application/json
+Content-Type: application/json
+
+{
+  "user_uuid": "77803c1a-8c1a-492a-89be-f219735b2aef"
+}

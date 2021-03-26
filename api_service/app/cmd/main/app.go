@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
+	"github.com/theartofdevel/notes_system/api_service/internal/client/category"
 	"github.com/theartofdevel/notes_system/api_service/internal/config"
 	"github.com/theartofdevel/notes_system/api_service/internal/handlers/auth"
 	"github.com/theartofdevel/notes_system/api_service/internal/handlers/categories"
@@ -42,7 +43,11 @@ func main() {
 	metricHandler := metric.Handler{Logger: logger}
 	metricHandler.Register(router)
 
-	categoriesHandler := categories.Handler{Logger: logger}
+	categoryService := category.NewClient(cfg.CategoryService.URL, logger)
+	categoriesHandler := categories.Handler{
+		CategoryService: categoryService,
+		Logger:          logger,
+	}
 	categoriesHandler.Register(router)
 
 	notesHandler := notes.Handler{Logger: logger}

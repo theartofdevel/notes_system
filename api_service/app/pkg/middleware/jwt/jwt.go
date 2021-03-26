@@ -54,7 +54,7 @@ func JWTMiddleware(h http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), "user_id", uc.ID)
+		ctx := context.WithValue(r.Context(), "user_uuid", uc.ID)
 		h(w, r.WithContext(ctx))
 	}
 }

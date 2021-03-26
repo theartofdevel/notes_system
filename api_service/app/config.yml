@@ -7,3 +7,5 @@ listen:
   type: port
   bind_ip: localhost
   port: 8080
+category_service:
+  url: http://127.0.0.1:5000/api

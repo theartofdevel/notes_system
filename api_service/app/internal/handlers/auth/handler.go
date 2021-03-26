@@ -123,7 +123,7 @@ func (h *Handler) generateAccessToken() ([]byte, int) {
 	// TODO insert real user data in claims
 	claims := jwt2.UserClaims{
 		RegisteredClaims: jwt.RegisteredClaims{
-			ID:        "uuid_here",
+			ID:        "77803c1a-8c1a-492a-89be-f219735b2aef",
 			Audience:  []string{"users"},
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 60)),
 		},
@@ -137,7 +137,7 @@ func (h *Handler) generateAccessToken() ([]byte, int) {
 
 	h.Logger.Info("create refresh token")
 	refreshTokenUuid := uuid.New()
-	err = h.RTCache.Set([]byte(refreshTokenUuid.String()), []byte("user_uuid"), 0)
+	err = h.RTCache.Set([]byte(refreshTokenUuid.String()), []byte(claims.ID), 0)
 	if err != nil {
 		h.Logger.Error(err)
 		return nil, http.StatusInternalServerError
