@@ -1,0 +1,15 @@
+---
+
+is_debug: true
+listen:
+  type: port
+  bind_ip: localhost
+  port: 8083
+mongodb:
+  host: localhost
+  port: 27017
+  username: testadm
+  password: testadm
+  auth_db: admin
+  database: notes_system
+  collection: tags

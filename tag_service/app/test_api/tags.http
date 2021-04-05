@@ -1,0 +1,27 @@
+GET http://localhost:8083/api/tags?id=1,2,3,4,5,6,7,8,9
+Accept: application/json
+
+### Create tag
+
+POST http://localhost:8083/api/tags
+Content-Type: application/json
+
+{
+  "name": "tag 2",
+  "color": "hex",
+  "user_uuid": "1"
+}
+
+### Update tag
+
+PATCH http://localhost:8083/api/tags/3
+Content-Type: application/json
+
+{
+  "name": "oops"
+}
+
+### Delete tag
+
+DELETE http://localhost:8083/api/tags/2
+Content-Type: application/json
