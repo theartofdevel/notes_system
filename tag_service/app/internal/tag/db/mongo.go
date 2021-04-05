@@ -64,7 +64,7 @@ func (s *db) Create(ctx context.Context, dto tag.CreateTagDTO) (id int, err erro
 	var nTag tag.Tag
 	cursor, err := s.collection.Find(nCtx, bson.M{}, &findOptions)
 	if err != nil {
-		return id, err
+		return id, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 
 	nTagID := 1
@@ -76,10 +76,8 @@ func (s *db) Create(ctx context.Context, dto tag.CreateTagDTO) (id int, err erro
 				return 0, err
 			}
 			nTagID = nTag.ID + 1
-		} else {
-			if tryCount < 3 {
-				return id, fmt.Errorf("duplicate key error")
-			}
+		} else if tryCount < 3 {
+			return id, fmt.Errorf("duplicate key error")
 		}
 
 		tryCount--
@@ -150,7 +148,6 @@ func (s *db) FindMany(ctx context.Context, ids []int) (tags []tag.Tag, err error
 		return tags, nil
 	}
 	return tags, fmt.Errorf("failed to decode document. error: %w", err)
-
 }
 
 func (s *db) Update(ctx context.Context, id int, dto tag.UpdateTagDTO) error {

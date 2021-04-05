@@ -11,4 +11,3 @@ type Storage interface {
 	Update(ctx context.Context, uuid string, user UpdateUserDTO) error
 	Delete(ctx context.Context, uuid string) error
 }
-

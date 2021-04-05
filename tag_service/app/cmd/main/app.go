@@ -40,7 +40,7 @@ func main() {
 		panic(err)
 	}
 
-	tagService, err := tag.NewService(context.Background(), tagStorage, logger)
+	tagService, err := tag.NewService(tagStorage, logger)
 	if err != nil {
 		panic(err)
 	}

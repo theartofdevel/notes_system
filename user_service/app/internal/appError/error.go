@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	ErrNotFound = NewAppError("not found", "NS-000003", "" )
+	ErrNotFound = NewAppError("not found", "NS-000003", "")
 )
 
 type AppError struct {
@@ -18,9 +18,9 @@ type AppError struct {
 
 func NewAppError(message, code, developerMessage string) *AppError {
 	return &AppError{
-		Err:     fmt.Errorf(message),
-		Code:    code,
-		Message: message,
+		Err:              fmt.Errorf(message),
+		Code:             code,
+		Message:          message,
 		DeveloperMessage: developerMessage,
 	}
 }
@@ -44,5 +44,5 @@ func BadRequestError(message string) *AppError {
 }
 
 func systemError(developerMessage string) *AppError {
-	return NewAppError("system error", "NS-000001", developerMessage )
+	return NewAppError("system error", "NS-000001", developerMessage)
 }

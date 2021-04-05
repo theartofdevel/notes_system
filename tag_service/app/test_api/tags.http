@@ -23,5 +23,5 @@ Content-Type: application/json
 
 ### Delete tag
 
-DELETE http://localhost:8083/api/tags/2
+DELETE http://localhost:8083/api/tags/1
 Content-Type: application/json

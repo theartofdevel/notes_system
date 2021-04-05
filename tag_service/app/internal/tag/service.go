@@ -15,7 +15,7 @@ type service struct {
 	logger  logging.Logger
 }
 
-func NewService(ctx context.Context, tagStorage Storage, logger logging.Logger) (Service, error) {
+func NewService(tagStorage Storage, logger logging.Logger) (Service, error) {
 	return &service{
 		storage: tagStorage,
 		logger:  logger,
@@ -50,7 +50,7 @@ func (s service) GetOne(ctx context.Context, id int) (t Tag, err error) {
 		if errors.Is(err, apperror.ErrNotFound) {
 			return t, err
 		}
-		return t, fmt.Errorf("failed to find tag by id. error: %w", err)
+		return t, fmt.Errorf("failed to get one tag by id. error: %w", err)
 	}
 	return t, nil
 }
@@ -62,8 +62,12 @@ func (s service) GetMany(ctx context.Context, ids []int) (tags []Tag, err error)
 		if errors.Is(err, apperror.ErrNotFound) {
 			return tags, err
 		}
-		return tags, fmt.Errorf("failed to find many tags by ids. error: %w", err)
+		return tags, fmt.Errorf("failed to get many tags by ids. error: %w", err)
 	}
+	if len(tags) == 0 {
+		return tags, apperror.ErrNotFound
+	}
+
 	return tags, nil
 }
 

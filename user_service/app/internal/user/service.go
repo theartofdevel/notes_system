@@ -16,7 +16,7 @@ type service struct {
 	logger  logging.Logger
 }
 
-func NewService(ctx context.Context, userStorage Storage, logger logging.Logger) (Service, error) {
+func NewService(userStorage Storage, logger logging.Logger) (Service, error) {
 	return &service{
 		storage: userStorage,
 		logger:  logger,
@@ -58,7 +58,6 @@ func (s service) Create(ctx context.Context, dto CreateUserDTO) (userUUID string
 
 func (s service) GetByEmailAndPassword(ctx context.Context, email, password string) (u User, err error) {
 	u, err = s.storage.FindByEmail(ctx, email)
-
 
 	if err != nil {
 		if errors.Is(err, apperror.ErrNotFound) {

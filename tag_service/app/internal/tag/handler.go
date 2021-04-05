@@ -46,6 +46,8 @@ func (h *Handler) GetTag(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return err
 	}
+
+	h.Logger.Debug("marshal tag")
 	tagsBytes, err := json.Marshal(tag)
 	if err != nil {
 		return err
@@ -82,9 +84,6 @@ func (h *Handler) GetTags(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return err
 	}
-	if len(tags) == 0 {
-		return apperror.ErrNotFound
-	}
 
 	h.Logger.Debug("marshal tags")
 	tagsBytes, err := json.Marshal(tags)
@@ -113,6 +112,7 @@ func (h *Handler) CreateTag(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return err
 	}
+
 	w.Header().Set("Location", fmt.Sprintf("%s/%d", tagsURL, tagID))
 	w.WriteHeader(http.StatusCreated)
 

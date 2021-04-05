@@ -39,7 +39,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	userService, err := user.NewService(context.Background(), userStorage, logger)
+	userService, err := user.NewService(userStorage, logger)
 	if err != nil {
 		panic(err)
 	}
