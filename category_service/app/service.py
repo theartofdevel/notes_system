@@ -6,7 +6,7 @@ from injector import inject
 from dao.category.category import CategoryDAO
 from dao.model.dto import CreateCategoryDTO, UpdateCategoryDTO, DeleteCategoryDTO
 from dao.model.model import Category
-from exceptions import AppException, AppError
+from exceptions import AppError, NotFoundException
 
 
 class CategoryService:
@@ -20,7 +20,7 @@ class CategoryService:
     def get_categories(self, user_uuid: str) -> List["Category"]:
         is_exist = self.category_dao.check_user_exist(user_uuid=user_uuid)
         if not is_exist:
-            raise AppException(exc_data=AppError.USER_NOT_FOUND)
+            raise NotFoundException(exc_data=AppError.USER_NOT_FOUND)
 
         return self.category_dao.find_user_categories(user_uuid=user_uuid)
 
@@ -31,7 +31,7 @@ class CategoryService:
         else:
             is_exist = self.category_dao.check_category_exist(category_uuid=category.parent_uuid)
             if not is_exist:
-                raise AppException(exc_data=AppError.CATEGORY_NOT_FOUND)
+                raise NotFoundException(exc_data=AppError.CATEGORY_NOT_FOUND)
             self.logger.debug("paren category is present. create sub category")
             # TODO check that parent category belong to user
             return self.category_dao.create_sub_category(category=category)
@@ -39,12 +39,12 @@ class CategoryService:
     def update_category(self, category: UpdateCategoryDTO) -> None:
         is_exist = self.category_dao.check_category_exist(category_uuid=category.uuid)
         if not is_exist:
-            raise AppException(exc_data=AppError.CATEGORY_NOT_FOUND)
+            raise NotFoundException(exc_data=AppError.CATEGORY_NOT_FOUND)
         self.category_dao.update_category(category=category)
 
     def delete_category(self, category: DeleteCategoryDTO) -> None:
         # TODO check that category belong to user
         is_exist = self.category_dao.check_category_exist(category_uuid=category.uuid)
         if not is_exist:
-            raise AppException(exc_data=AppError.CATEGORY_NOT_FOUND)
+            raise NotFoundException(exc_data=AppError.CATEGORY_NOT_FOUND)
         self.category_dao.delete_category(category=category)

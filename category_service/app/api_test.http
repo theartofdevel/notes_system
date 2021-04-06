@@ -8,7 +8,7 @@ Accept: application/json
 Content-Type: application/json
 
 {
-  "name": "New category",
+  "name": "New category 1",
   "user_uuid": "77803c1a-8c1a-492a-89be-f219735b2aef"
 }
 
@@ -19,25 +19,25 @@ Accept: application/json
 Content-Type: application/json
 
 {
-  "name": "New category",
+  "name": "Sub category 1",
   "user_uuid": "77803c1a-8c1a-492a-89be-f219735b2aef",
-  "parent_uuid": "c2ae415d-77a3-466b-8435-7022d1684e8e"
+  "parent_uuid": "85970ed4-37d2-41c9-9353-65ee8264ebdc"
 }
 
 ### Update category
 
-PATCH http://localhost:5000/api/categories/00e9e849-1a82-46bc-b104-12cc61abd757
+PATCH http://localhost:5000/api/categories/af20d9e9-c651-4c71-9cc8-7e18c675f87c
 Accept: application/json
 Content-Type: application/json
 
 {
-  "name": "changed category name",
+  "name": "1 sub category",
   "user_uuid": "77803c1a-8c1a-492a-89be-f219735b2aef"
 }
 
 ### Delete category
 
-DELETE http://localhost:5000/api/categories/00e9e849-1a82-46bc-b104-12cc61abd757
+DELETE http://localhost:5000/api/categories/85970ed4-37d2-41c9-9353-65ee8264ebdc
 Accept: application/json
 Content-Type: application/json
 

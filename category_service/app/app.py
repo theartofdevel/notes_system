@@ -2,7 +2,7 @@ import logging
 import os
 from pprint import pprint
 
-from flask import Flask
+from flask import Flask, make_response, jsonify
 from flask_cors import CORS
 from flask_injector import FlaskInjector
 from flask_restful import Api
@@ -12,7 +12,7 @@ from webargs.flaskparser import parser, abort
 from config import Config
 from constants import LOG_DIR, CONFIG_FILE_PATH, ANY_ORIGIN, EXPOSE_HEADERS
 from di import StorageModule, LoggerModule
-from exceptions import AppException
+from exceptions import AppException, ValidationException, AppError
 from helpers.flask import app_exception_handler, uncaught_exception_handler
 from resources import CategoryResource, CategoriesResource
 
@@ -51,11 +51,19 @@ if not config.DEBUG:
 
 @parser.error_handler
 def handle_request_parsing_error(err, req, schema, *, error_status_code, error_headers):
-    abort(error_status_code, errors=err.messages)
+    developer_message = ""
+    for field_name, errors in err.messages["json"].items():
+        developer_message += f"Error field '{field_name}': "
+        c = 0
+        for i in errors:
+            c += 1
+            developer_message += f"{i}"
+            if c != len(errors):
+                developer_message += ","
+    raise ValidationException(exc_data=AppError.VALIDATION_ERROR, developer_message=developer_message)
 
 
 pprint(app.url_map)
-
 
 if __name__ == '__main__':
     app.run(host="localhost", port=5000, debug=True)

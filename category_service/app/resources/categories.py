@@ -26,14 +26,18 @@ class CategoryResource(MethodResource, Resource):
     def patch(self, category_dto: UpdateCategoryDTO, cuuid: str):
         category_dto.uuid = cuuid
         self.service.update_category(category=category_dto)
-        return make_response(jsonify(), HTTPStatus.NO_CONTENT)
+        r = make_response(jsonify(), HTTPStatus.NO_CONTENT)
+        r.headers["Content-Type"] = "application/json"
+        return r
 
     @use_kwargs(DeleteCategoryDTO.to_schema())
     @marshal_with(None, code=HTTPStatus.NO_CONTENT)
     def delete(self, category_dto: DeleteCategoryDTO, cuuid: str):
         category_dto.uuid = cuuid
         self.service.delete_category(category=category_dto)
-        return make_response(jsonify(), HTTPStatus.NO_CONTENT)
+        r = make_response(jsonify(), HTTPStatus.NO_CONTENT)
+        r.headers["Content-Type"] = "application/json"
+        return r
 
 
 class CategoriesResource(MethodResource, Resource):
@@ -48,7 +52,9 @@ class CategoriesResource(MethodResource, Resource):
     def get(self):
         user_uuid = request.args.get("user_uuid")
         categories = self.service.get_categories(user_uuid=user_uuid)
-        return make_response(json.dumps(categories, cls=CustomJSONEncoder), HTTPStatus.OK)
+        r = make_response(json.dumps(categories, cls=CustomJSONEncoder), HTTPStatus.OK)
+        r.headers["Content-Type"] = "application/json"
+        return r
 
     @use_kwargs(CreateCategoryDTO.to_schema())
     @marshal_with(None, code=HTTPStatus.NO_CONTENT)
@@ -56,4 +62,5 @@ class CategoriesResource(MethodResource, Resource):
         category = self.service.create_category(category=category_dto)
         r = make_response(jsonify(), HTTPStatus.NO_CONTENT)
         r.headers["Location"] = f"/api/categories/{category.uuid}"
+        r.headers["Content-Type"] = "application/json"
         return r
