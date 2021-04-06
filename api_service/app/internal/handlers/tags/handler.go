@@ -31,9 +31,9 @@ type Handler struct {
 }
 
 func (h *Handler) Register(router *httprouter.Router) {
-	router.HandlerFunc(http.MethodPost, tagsURL, jwt.JWTMiddleware(h.CreateTag))
-	router.HandlerFunc(http.MethodPatch, tagURL, jwt.JWTMiddleware(h.PartiallyUpdateTag))
-	router.HandlerFunc(http.MethodDelete, tagURL, jwt.JWTMiddleware(h.DeleteTag))
+	router.HandlerFunc(http.MethodPost, tagsURL, jwt.Middleware(h.CreateTag))
+	router.HandlerFunc(http.MethodPatch, tagURL, jwt.Middleware(h.PartiallyUpdateTag))
+	router.HandlerFunc(http.MethodDelete, tagURL, jwt.Middleware(h.DeleteTag))
 }
 
 func (h *Handler) CreateTag(w http.ResponseWriter, r *http.Request) {

@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"github.com/theartofdevel/notes_system/api_service/pkg/logging"
 	"net/http"
+	"net/url"
+	"path"
 	"sync"
 )
 
@@ -16,7 +18,7 @@ type BaseClient struct {
 	Logger     logging.Logger
 }
 
-func (c *BaseClient) SendRequest(req *http.Request) (*http.Response, error) {
+func (c *BaseClient) SendRequest(req *http.Request) (*APIResponse, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -29,24 +31,45 @@ func (c *BaseClient) SendRequest(req *http.Request) (*http.Response, error) {
 
 	response, err := c.HTTPClient.Do(req)
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("failed to send request. error: %s", err))
+		return nil, fmt.Errorf("failed to send request. error: %w", err)
 	}
 
+	apiResponse := APIResponse{
+		IsOk: true,
+		response: response,
+	}
 	if response.StatusCode < http.StatusOK || response.StatusCode >= http.StatusBadRequest {
+		apiResponse.IsOk = false
 		// if an error, read body so close it
 		defer response.Body.Close()
 
-		var errResponse APIErrorResponse
-		if err = json.NewDecoder(response.Body).Decode(&errResponse); err == nil {
-			return nil, errors.New(errResponse.ToString())
+		var apiErr APIError
+		if err = json.NewDecoder(response.Body).Decode(&apiErr); err == nil {
+			apiResponse.Error = apiErr
 		}
-
-		return nil, errors.New(fmt.Sprintf("got an error response, can't decode to error response, StatusCode: %d, Body: %v", response.StatusCode, response.Body))
 	}
 
-	return response, nil
+	return &apiResponse, nil
 }
 
+func (c *BaseClient) BuildURL(resource string, filters []FilterOptions) (string, error) {
+	var resultURL string
+	parsedURL, err := url.ParseRequestURI(c.BaseURL)
+	if err != nil {
+		return resultURL, fmt.Errorf("failed to parse base URL. error: %w", err)
+	}
+	parsedURL.Path = path.Join(parsedURL.Path, resource)
+
+	if len(filters) > 0 {
+		q := parsedURL.Query()
+		for _, fo := range filters {
+			q.Set(fo.Field, fo.ToStringWF())
+		}
+		parsedURL.RawQuery = q.Encode()
+	}
+
+	return parsedURL.String(), nil
+}
 
 func (c *BaseClient) Close() error {
 	c.mu.Lock()

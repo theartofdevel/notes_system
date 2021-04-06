@@ -11,12 +11,7 @@ import (
 	"time"
 )
 
-type UserClaims struct {
-	jwt.RegisteredClaims
-	Email string `json:"email"`
-}
-
-func JWTMiddleware(h http.HandlerFunc) http.HandlerFunc {
+func Middleware(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		logger := logging.GetLogger()
 		authHeader := strings.Split(r.Header.Get("Authorization"), "Bearer ")

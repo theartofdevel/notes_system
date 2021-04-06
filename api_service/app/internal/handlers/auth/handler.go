@@ -1,155 +1,89 @@
 package auth
 
 import (
+	"context"
 	"encoding/json"
-	"github.com/cristalhq/jwt/v3"
-	"github.com/google/uuid"
 	"github.com/julienschmidt/httprouter"
-	"github.com/theartofdevel/notes_system/api_service/internal/config"
-	"github.com/theartofdevel/notes_system/api_service/pkg/cache"
+	"github.com/theartofdevel/notes_system/api_service/internal/apperror"
+	"github.com/theartofdevel/notes_system/api_service/internal/client/user_service"
+	"github.com/theartofdevel/notes_system/api_service/pkg/jwt"
 	"github.com/theartofdevel/notes_system/api_service/pkg/logging"
-	jwt2 "github.com/theartofdevel/notes_system/api_service/pkg/middleware/jwt"
 	"net/http"
-	"time"
 )
 
 const (
-	authURL = "/api/auth"
+	authURL   = "/api/auth"
 	signupURL = "/api/signup"
 )
 
-type user struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
-type newUser struct {
-	user
-	Email string `json:"email"`
-}
-
-type refresh struct {
-	RefreshToken string `json:"refresh_token"`
-}
-
 type Handler struct {
-	Logger logging.Logger
-	RTCache cache.Repository
+	Logger      logging.Logger
+	UserService user_service.UserService
+	JWTHelper   jwt.Helper
 }
 
 func (h *Handler) Register(router *httprouter.Router) {
-	router.HandlerFunc(http.MethodPost, authURL, h.Auth)
-	router.HandlerFunc(http.MethodPut, authURL, h.Auth)
-	router.HandlerFunc(http.MethodPost, signupURL, h.Signup)
+	router.HandlerFunc(http.MethodPost, authURL, apperror.Middleware(h.Auth))
+	router.HandlerFunc(http.MethodPut, authURL, apperror.Middleware(h.Auth))
+	router.HandlerFunc(http.MethodPost, signupURL, apperror.Middleware(h.Signup))
 }
 
-func (h *Handler) Signup(w http.ResponseWriter, r *http.Request) {
-	var nu newUser
-	if err := json.NewDecoder(r.Body).Decode(&nu); err != nil {
-		h.Logger.Error(err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
+func (h *Handler) Signup(w http.ResponseWriter, r *http.Request) error {
+	defer r.Body.Close()
+	var dto user_service.CreateUserDTO
+	if err := json.NewDecoder(r.Body).Decode(&dto); err != nil {
+		return apperror.BadRequestError("failed to decode data")
 	}
 
-	defer r.Body.Close()
-
-	// TODO validate username and password
-	// TODO create user using UserService
-	jsonBytes, errCode := h.generateAccessToken()
-	if errCode != 0 {
-		w.WriteHeader(errCode)
-		return
+	u, err := h.UserService.Create(context.Background(), dto)
+	if err != nil {
+		return err
+	}
+	token, err := h.JWTHelper.GenerateAccessToken(u)
+	if err != nil {
+		return err
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(201)
-	w.Write(jsonBytes)
+	w.WriteHeader(http.StatusCreated)
+	w.Write(token)
+
+	return nil
 }
 
-func (h *Handler) Auth(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) Auth(w http.ResponseWriter, r *http.Request) error {
+	var token []byte
+	var err error
 	switch r.Method {
 	case http.MethodPost:
-		var u user
-		if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
-			h.Logger.Error(err)
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-
 		defer r.Body.Close()
-		// TODO client to UserService and get user by username and password
-		// for now stub check
-		if u.Username != "me" || u.Password != "pass" {
-			w.WriteHeader(http.StatusNotFound)
-			return
+		var dto user_service.SigninUserDTO
+		if err := json.NewDecoder(r.Body).Decode(&dto); err != nil {
+			return apperror.BadRequestError("failed to decode data")
+		}
+		u, err := h.UserService.GetByEmailAndPassword(context.Background(), dto.Email, dto.Password)
+		if err != nil {
+			return err
+		}
+		token, err = h.JWTHelper.GenerateAccessToken(u)
+		if err != nil {
+			return err
 		}
 	case http.MethodPut:
-		var refreshTokenS refresh
-		if err := json.NewDecoder(r.Body).Decode(&refreshTokenS); err != nil {
-			h.Logger.Error(err)
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
 		defer r.Body.Close()
-		userIdBytes, err := h.RTCache.Get([]byte(refreshTokenS.RefreshToken))
-		h.Logger.Info("refresh token user_id: %s", userIdBytes)
-		if err != nil {
-			h.Logger.Error(err)
-			w.WriteHeader(http.StatusUnauthorized)
-			return
+		var rt jwt.RT
+		if err := json.NewDecoder(r.Body).Decode(&rt); err != nil {
+			return apperror.BadRequestError("failed to decode data")
 		}
-		h.RTCache.Del([]byte(refreshTokenS.RefreshToken))
-		// TODO client to UserService and get user by username
+		token, err = h.JWTHelper.UpdateRefreshToken(rt)
+		if err != nil {
+			return err
+		}
 	}
 
-	jsonBytes, errCode := h.generateAccessToken()
-	if errCode != 0 {
-		w.WriteHeader(errCode)
-		return
-	}
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(201)
-	w.Write(jsonBytes)
-}
+	w.WriteHeader(http.StatusCreated)
+	w.Write(token)
 
-func (h *Handler) generateAccessToken() ([]byte, int) {
-	key := []byte(config.GetConfig().JWT.Secret)
-	signer, err := jwt.NewSignerHS(jwt.HS256, key)
-	if err != nil {
-		return nil, 418
-	}
-	builder := jwt.NewBuilder(signer)
-
-	// TODO insert real user data in claims
-	claims := jwt2.UserClaims{
-		RegisteredClaims: jwt.RegisteredClaims{
-			ID:        "77803c1a-8c1a-492a-89be-f219735b2aef",
-			Audience:  []string{"users"},
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 60)),
-		},
-		Email: "email@will.be.here",
-	}
-	token, err := builder.Build(claims)
-	if err != nil {
-		h.Logger.Error(err)
-		return nil, http.StatusUnauthorized
-	}
-
-	h.Logger.Info("create refresh token")
-	refreshTokenUuid := uuid.New()
-	err = h.RTCache.Set([]byte(refreshTokenUuid.String()), []byte(claims.ID), 0)
-	if err != nil {
-		h.Logger.Error(err)
-		return nil, http.StatusInternalServerError
-	}
-
-	jsonBytes, err := json.Marshal(map[string]string{
-		"token": token.String(),
-		"refresh_token": refreshTokenUuid.String(),
-	})
-	if err != nil {
-		return nil, http.StatusInternalServerError
-	}
-
-	return jsonBytes, 0
+	return err
 }

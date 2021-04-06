@@ -1,4 +1,4 @@
-package category
+package category_service
 
 type CreateCategoryDTO struct {
 	Name       string `json:"name"`

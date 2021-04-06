@@ -4,13 +4,18 @@ import (
 	"errors"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
-	"github.com/theartofdevel/notes_system/api_service/internal/client/category"
+	"github.com/theartofdevel/notes_system/api_service/internal/client/category_service"
+	"github.com/theartofdevel/notes_system/api_service/internal/client/note_service"
+	"github.com/theartofdevel/notes_system/api_service/internal/client/tag_service"
+	"github.com/theartofdevel/notes_system/api_service/internal/client/user_service"
 	"github.com/theartofdevel/notes_system/api_service/internal/config"
 	"github.com/theartofdevel/notes_system/api_service/internal/handlers/auth"
 	"github.com/theartofdevel/notes_system/api_service/internal/handlers/categories"
 	"github.com/theartofdevel/notes_system/api_service/internal/handlers/notes"
+	"github.com/theartofdevel/notes_system/api_service/internal/handlers/tags"
 	"github.com/theartofdevel/notes_system/api_service/pkg/cache/freecache"
 	"github.com/theartofdevel/notes_system/api_service/pkg/handlers/metric"
+	"github.com/theartofdevel/notes_system/api_service/pkg/jwt"
 	"github.com/theartofdevel/notes_system/api_service/pkg/logging"
 	"github.com/theartofdevel/notes_system/api_service/pkg/shutdown"
 	"net"
@@ -36,22 +41,29 @@ func main() {
 	logger.Println("cache initializing")
 	refreshTokenCache := freecache.NewCacheRepo(104857600) // 100MB
 
+	logger.Println("helpers initializing")
+	jwtHelper := jwt.NewHelper(refreshTokenCache, logger)
+
 	logger.Println("create and register handlers")
-	authHandler := auth.Handler{RTCache: refreshTokenCache, Logger: logger}
-	authHandler.Register(router)
 
 	metricHandler := metric.Handler{Logger: logger}
 	metricHandler.Register(router)
 
-	categoryService := category.NewClient(cfg.CategoryService.URL, logger)
-	categoriesHandler := categories.Handler{
-		CategoryService: categoryService,
-		Logger:          logger,
-	}
+	userService := user_service.NewService(cfg.UserService.URL, "/users", logger)
+	authHandler := auth.Handler{RTCache: refreshTokenCache, UserService: userService, Logger: logger}
+	authHandler.Register(router)
+
+	categoryService := category_service.NewService(cfg.CategoryService.URL, "/categories", logger)
+	categoriesHandler := categories.Handler{CategoryService: categoryService, Logger: logger}
 	categoriesHandler.Register(router)
 
-	notesHandler := notes.Handler{Logger: logger}
+	noteService := note_service.NewService(cfg.NoteService.URL, "/notes", logger)
+	notesHandler := notes.Handler{NoteService: noteService, Logger: logger}
 	notesHandler.Register(router)
+
+	tagService := tag_service.NewService(cfg.TagService.URL, "/tags", logger)
+	tagsHandler := tags.Handler{TagService: tagService, Logger: logger}
+	tagsHandler.Register(router)
 
 	logger.Println("start application")
 	start(router, logger, cfg)

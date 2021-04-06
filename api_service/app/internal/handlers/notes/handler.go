@@ -32,11 +32,11 @@ type Handler struct {
 }
 
 func (h *Handler) Register(router *httprouter.Router) {
-	router.HandlerFunc(http.MethodGet, notesURL, jwt.JWTMiddleware(h.GetNotes))
-	router.HandlerFunc(http.MethodPost, notesURL, jwt.JWTMiddleware(h.CreateNote))
-	router.HandlerFunc(http.MethodGet, noteURL, jwt.JWTMiddleware(h.GetNoteByUuid))
-	router.HandlerFunc(http.MethodPatch, noteURL, jwt.JWTMiddleware(h.PartiallyUpdateNote))
-	router.HandlerFunc(http.MethodDelete, noteURL, jwt.JWTMiddleware(h.DeleteNote))
+	router.HandlerFunc(http.MethodGet, notesURL, jwt.Middleware(h.GetNotes))
+	router.HandlerFunc(http.MethodPost, notesURL, jwt.Middleware(h.CreateNote))
+	router.HandlerFunc(http.MethodGet, noteURL, jwt.Middleware(h.GetNoteByUuid))
+	router.HandlerFunc(http.MethodPatch, noteURL, jwt.Middleware(h.PartiallyUpdateNote))
+	router.HandlerFunc(http.MethodDelete, noteURL, jwt.Middleware(h.DeleteNote))
 }
 
 func (h *Handler) GetNotes(w http.ResponseWriter, r *http.Request) {

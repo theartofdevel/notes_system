@@ -5,9 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
-	"github.com/theartofdevel/notes_system/api_service/internal/client/category"
+	"github.com/theartofdevel/notes_system/api_service/internal/apperror"
+	"github.com/theartofdevel/notes_system/api_service/internal/client/category_service"
+	"github.com/theartofdevel/notes_system/api_service/pkg/jwt"
 	"github.com/theartofdevel/notes_system/api_service/pkg/logging"
-	"github.com/theartofdevel/notes_system/api_service/pkg/middleware/jwt"
 	"net/http"
 )
 
@@ -17,108 +18,99 @@ const (
 )
 
 type Handler struct {
-	CategoryService *category.Client
+	CategoryService category_service.CategoryService
 	Logger          logging.Logger
 }
 
 func (h *Handler) Register(router *httprouter.Router) {
-	router.HandlerFunc(http.MethodGet, categoriesURL, jwt.JWTMiddleware(h.GetCategories))
-	router.HandlerFunc(http.MethodPost, categoriesURL, jwt.JWTMiddleware(h.CreateCategory))
-	router.HandlerFunc(http.MethodPatch, categoryURL, jwt.JWTMiddleware(h.PartiallyUpdateCategory))
-	router.HandlerFunc(http.MethodDelete, categoryURL, jwt.JWTMiddleware(h.DeleteCategory))
+	router.HandlerFunc(http.MethodGet, categoriesURL, jwt.Middleware(apperror.Middleware(h.GetCategories)))
+	router.HandlerFunc(http.MethodPost, categoriesURL, jwt.Middleware(apperror.Middleware(h.CreateCategory)))
+	router.HandlerFunc(http.MethodPatch, categoryURL, jwt.Middleware(apperror.Middleware(h.PartiallyUpdateCategory)))
+	router.HandlerFunc(http.MethodDelete, categoryURL, jwt.Middleware(apperror.Middleware(h.DeleteCategory)))
 }
 
-func (h *Handler) GetCategories(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetCategories(w http.ResponseWriter, r *http.Request) error {
 	if r.Context().Value("user_uuid") == nil {
 		h.Logger.Error("there is no user_uuid in context")
-		w.WriteHeader(http.StatusUnauthorized)
-		return
+		return apperror.UnauthorizedError("unauthorized")
 	}
 	userUuid := r.Context().Value("user_uuid").(string)
-	categories, err := h.CategoryService.GetCategories(userUuid, context.Background(), nil)
+	categories, err := h.CategoryService.GetUserCategories(context.Background(), userUuid)
 	if err != nil {
-		h.Logger.Error(err)
-		w.WriteHeader(418)
-		return
+		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(categories)
+
+	return nil
 }
 
-func (h *Handler) CreateCategory(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) CreateCategory(w http.ResponseWriter, r *http.Request) error {
 	if r.Context().Value("user_uuid") == nil {
 		h.Logger.Error("there is no user_uuid in context")
-		w.WriteHeader(http.StatusUnauthorized)
-		return
+		return apperror.UnauthorizedError("unauthorized")
 	}
 	userUuid := r.Context().Value("user_uuid").(string)
 
-	var crCategory category.CreateCategoryDTO
+	var crCategory category_service.CreateCategoryDTO
 	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&crCategory); err != nil {
-		h.Logger.Error(err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		return apperror.BadRequestError("failed to decode data")
 	}
 	crCategory.UserUuid = userUuid
 	w.Header().Set("Content-Type", "application/json")
 
-	categoryUuid, err := h.CategoryService.CreateCategory(crCategory, context.Background(), nil)
+	categoryUuid, err := h.CategoryService.CreateCategory(context.Background(), crCategory)
 	if err != nil {
-		h.Logger.Error(err)
-		w.WriteHeader(418)
-		return
+		return err
 	}
 	w.Header().Set("Location", fmt.Sprintf("%s/%s", categoriesURL, categoryUuid))
 	w.WriteHeader(http.StatusCreated)
+
+	return nil
 }
 
-func (h *Handler) PartiallyUpdateCategory(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) PartiallyUpdateCategory(w http.ResponseWriter, r *http.Request) error {
 	if r.Context().Value("user_uuid") == nil {
 		h.Logger.Error("there is no user_uuid in context")
-		w.WriteHeader(http.StatusUnauthorized)
-		return
+		return apperror.UnauthorizedError("unauthorized")
 	}
 	userUuid := r.Context().Value("user_uuid").(string)
 
 	params := r.Context().Value(httprouter.ParamsKey).(httprouter.Params)
 	categoryUuid := params.ByName("uuid")
-	var categoryDTO category.UpdateCategoryDTO
+	var categoryDTO category_service.UpdateCategoryDTO
 	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&categoryDTO); err != nil {
-		h.Logger.Error(err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		return apperror.BadRequestError("failed to decode data")
 	}
-	categoryDTO.Uuid = categoryUuid
 	categoryDTO.UserUuid = userUuid
-	err := h.CategoryService.UpdateCategory(categoryDTO, context.Background(), nil)
+	err := h.CategoryService.UpdateCategory(context.Background(), categoryUuid, categoryDTO)
 	if err != nil {
-		h.Logger.Error(err)
-		w.WriteHeader(418)
-		return
+		return err
 	}
 	w.WriteHeader(http.StatusNoContent)
+
+	return nil
 }
 
-func (h *Handler) DeleteCategory(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) DeleteCategory(w http.ResponseWriter, r *http.Request) error {
 	if r.Context().Value("user_uuid") == nil {
 		h.Logger.Error("there is no user_uuid in context")
-		w.WriteHeader(http.StatusUnauthorized)
-		return
+		return apperror.UnauthorizedError("unauthorized")
 	}
 
 	params := r.Context().Value(httprouter.ParamsKey).(httprouter.Params)
-	categoryDTO := category.DeleteCategoryDTO{
+	categoryDTO := category_service.DeleteCategoryDTO{
 		Uuid:     params.ByName("uuid"),
 		UserUuid: r.Context().Value("user_uuid").(string),
 	}
-	err := h.CategoryService.DeleteCategory(categoryDTO, context.Background(), nil)
+	err := h.CategoryService.DeleteCategory(context.Background(), categoryDTO)
 	if err != nil {
-		h.Logger.Error(err)
-		w.WriteHeader(418)
-		return
+		return err
 	}
 	w.WriteHeader(http.StatusNoContent)
+
+	return nil
 }

@@ -67,7 +67,7 @@ func Init() {
 	} else {
 		allFile, err := os.OpenFile("logs/all.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0660)
 		if err != nil {
-			panic(fmt.Sprintf("[Error]: %s", err))
+			panic(fmt.Sprintf("[Message]: %s", err))
 		}
 
 		l.SetOutput(ioutil.Discard) // Send all logs to nowhere by default
