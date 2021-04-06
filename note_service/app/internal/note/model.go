@@ -6,6 +6,7 @@ type Note struct {
 	Body         string `json:"body,omitempty" bson:"body"`
 	ShortBody    string `json:"short_body,omitempty" bson:"short_body"`
 	CategoryUUID string `json:"category_uuid" bson:"category_uuid"`
+	Tags         []int  `json:"tags" bson:"tags"`
 }
 
 type CreateNoteDTO struct {
@@ -13,6 +14,7 @@ type CreateNoteDTO struct {
 	Body         string `json:"body" bson:"body"`
 	ShortBody    string `json:"short_body,omitempty" bson:"short_body,omitempty"`
 	CategoryUUID string `json:"category_uuid" bson:"category_uuid"`
+	Tags         []int  `json:"tags" bson:"tags"`
 }
 
 func (cn *CreateNoteDTO) GenerateShortBody() {
@@ -29,4 +31,5 @@ type UpdateNoteDTO struct {
 	Header       string `json:"header,omitempty" bson:"header,omitempty"`
 	Body         string `json:"body,omitempty" bson:"body,omitempty"`
 	CategoryUUID string `json:"category_uuid,omitempty" bson:"category_uuid,omitempty"`
+	Tags         []int  `json:"tags,omitempty" bson:"tags,omitempty"`
 }

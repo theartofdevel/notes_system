@@ -131,7 +131,7 @@ func (s *db) FindByCategoryUUID(ctx context.Context, categoryUUID string) (notes
 	return notes, fmt.Errorf("failed to decode document. error: %w", err)
 }
 
-func (s *db) Update(ctx context.Context, uuid string, note note.UpdateNoteDTO) error {
+func (s *db) Update(ctx context.Context, uuid string, note note.UpdateNoteDTO, tagsUpdate bool) error {
 	err := s.isConnected(ctx)
 	if err != nil {
 		return fmt.Errorf("storage is not connected. error: %w", err)
@@ -157,6 +157,10 @@ func (s *db) Update(ctx context.Context, uuid string, note note.UpdateNoteDTO) e
 
 	update := bson.M{
 		"$set": updateObj,
+	}
+
+	if tagsUpdate {
+		update["$set"].(bson.M)["tags"] = note.Tags
 	}
 
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)

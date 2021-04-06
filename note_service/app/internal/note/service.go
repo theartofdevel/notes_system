@@ -26,7 +26,7 @@ type Service interface {
 	Create(ctx context.Context, dto CreateNoteDTO) (string, error)
 	GetOne(ctx context.Context, uuid string) (Note, error)
 	GetByCategoryUUID(ctx context.Context, uuid string) ([]Note, error)
-	Update(ctx context.Context, uuid string, dto UpdateNoteDTO) error
+	Update(ctx context.Context, uuid string, dto UpdateNoteDTO, tagsUpdate bool) error
 	Delete(ctx context.Context, uuid string) error
 }
 
@@ -71,11 +71,11 @@ func (s service) GetByCategoryUUID(ctx context.Context, uuid string) (notes []No
 	return notes, nil
 }
 
-func (s service) Update(ctx context.Context, uuid string, dto UpdateNoteDTO) error {
-	if dto.Body == "" && dto.Header == "" && dto.CategoryUUID == "" {
+func (s service) Update(ctx context.Context, uuid string, dto UpdateNoteDTO, tagsUpdate bool) error {
+	if dto.Body == "" && dto.Header == "" && dto.CategoryUUID == "" && !tagsUpdate {
 		return apperror.BadRequestError("nothing to update")
 	}
-	err := s.storage.Update(ctx, uuid, dto)
+	err := s.storage.Update(ctx, uuid, dto, tagsUpdate)
 
 	if err != nil {
 		if errors.Is(err, apperror.ErrNotFound) {

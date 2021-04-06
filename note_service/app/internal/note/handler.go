@@ -7,6 +7,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/theartofdevel/notes_system/note_service/internal/apperror"
 	"github.com/theartofdevel/notes_system/note_service/pkg/logging"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -112,14 +113,32 @@ func (h *Handler) PartiallyUpdateNote(w http.ResponseWriter, r *http.Request) er
 		return apperror.BadRequestError("uuid query parameter is required and must be a comma separated integers")
 	}
 
-	h.Logger.Debug("decode update note dto")
-	var noteDTO UpdateNoteDTO
+	h.Logger.Debug("read body bytes")
 	defer r.Body.Close()
-	if err := json.NewDecoder(r.Body).Decode(&noteDTO); err != nil {
+	bodyBytes, err := ioutil.ReadAll(r.Body)
+	if err != nil {
 		return err
 	}
 
-	err := h.NoteService.Update(context.Background(), noteUUID, noteDTO)
+	h.Logger.Debug("unmarshal body bytes to update note dto")
+	var noteDTO UpdateNoteDTO
+	if err := json.Unmarshal(bodyBytes, &noteDTO); err != nil {
+		return err
+	}
+	var tagsUpdate bool
+	if len(noteDTO.Tags) == 0 {
+		h.Logger.Debug("unmarshal body bytes to map")
+		var data map[string]interface{}
+		if err = json.Unmarshal(bodyBytes, &data); err != nil {
+			return err
+		}
+		h.Logger.Debug("check key tags in map")
+		if _, ok := data["tags"]; ok {
+			tagsUpdate = true
+		}
+	}
+
+	err = h.NoteService.Update(context.Background(), noteUUID, noteDTO, tagsUpdate)
 	if err != nil {
 		return err
 	}
