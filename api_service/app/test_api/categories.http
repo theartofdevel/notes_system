@@ -9,7 +9,7 @@ Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-  "name": "category from api"
+  "name": "Category 2"
 }
 
 ### Create sub category
@@ -19,24 +19,23 @@ Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-  "name": "again and again",
-  "parent_uuid": "2a0385f4-a8cd-4a18-8783-e6a1a420dcc8"
+  "name": "Sub Category 1",
+  "parent_uuid": "b0d5f934-df23-45a8-9d4d-c3226652ad2e"
 }
 
 
 ###
 
-PATCH http://localhost:8080/api/categories/33d79ffa-c60f-4681-9a15-de09c753af73
+PATCH http://localhost:8080/api/categories/58200afc-d484-4c2a-a240-1e3e51d1b0c4
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-  "name": "patched category",
-  "parent_id": "2a0385f4-a8cd-4a18-8783-e6a1a420dcc8"
+  "name": "Sub Category 1"
 }
 
 ###
 
-DELETE http://localhost:8080/api/categories/2a0385f4-a8cd-4a18-8783-e6a1a420dcc8
+DELETE http://localhost:8080/api/categories/58200afc-d484-4c2a-a240-1e3e51d1b0c4
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}

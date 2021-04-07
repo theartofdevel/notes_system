@@ -19,6 +19,15 @@ type Config struct {
 	CategoryService struct {
 		URL string `yaml:"url" env-required:"true"`
 	} `yaml:"category_service" env-required:"true"`
+	UserService struct {
+		URL string `yaml:"url" env-required:"true"`
+	} `yaml:"user_service" env-required:"true"`
+	NoteService struct {
+		URL string `yaml:"url" env-required:"true"`
+	} `yaml:"note_service" env-required:"true"`
+	TagService struct {
+		URL string `yaml:"url" env-required:"true"`
+	} `yaml:"tag_service" env-required:"true"`
 }
 
 var instance *Config

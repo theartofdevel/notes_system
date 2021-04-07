@@ -9,3 +9,9 @@ listen:
   port: 8080
 category_service:
   url: http://127.0.0.1:5000/api
+note_service:
+  url: http://127.0.0.1:8081/api
+user_service:
+  url: http://127.0.0.1:8082/api
+tag_service:
+  url: http://127.0.0.1:8083/api

@@ -1,38 +1,38 @@
-GET http://localhost:8080/api/notes
+### Get notes
+
+GET http://localhost:8080/api/notes?category_uuid=b0d5f934-df23-45a8-9d4d-c3226652ad2e
 Accept: application/json
 Authorization: Bearer {{auth_token}}
 
-###
+### Get note
 
-GET http://localhost:8080/api/notes/note_uuid
+GET http://localhost:8080/api/notes/60697c345ab2b15a8409fd5f
 Accept: application/json
 Authorization: Bearer {{auth_token}}
 
-###
+### Create note
 
 POST http://localhost:8080/api/notes
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-  "header": "header",
-  "body": "body",
-  "category_id": "5"
+  "header": "note 2 header",
+  "body": "note 2 body",
+  "category_uuid": "b0d5f934-df23-45a8-9d4d-c3226652ad2e"
 }
 
-###
+### Update note
 
-PATCH http://localhost:8080/api/notes/note_uuid
+PATCH http://localhost:8080/api/notes/606cf51a775e732f60669fae
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-  "header": "header",
-  "body": "body",
-  "category_id": "5"
+  "tags": [1,2,3,4]
 }
 
-###
+### Delete note
 
 DELETE http://localhost:8080/api/notes/uuid_here
 Content-Type: application/json

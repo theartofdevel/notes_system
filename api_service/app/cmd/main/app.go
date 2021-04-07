@@ -50,7 +50,7 @@ func main() {
 	metricHandler.Register(router)
 
 	userService := user_service.NewService(cfg.UserService.URL, "/users", logger)
-	authHandler := auth.Handler{RTCache: refreshTokenCache, UserService: userService, Logger: logger}
+	authHandler := auth.Handler{JWTHelper: jwtHelper, UserService: userService, Logger: logger}
 	authHandler.Register(router)
 
 	categoryService := category_service.NewService(cfg.CategoryService.URL, "/categories", logger)

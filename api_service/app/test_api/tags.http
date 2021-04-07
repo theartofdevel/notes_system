@@ -1,6 +1,6 @@
 ### Get tags
 
-GET http://localhost:8080/api/tags?id=1
+GET http://localhost:8080/api/tags?id=1,2,3,4
 Accept: application/json
 Authorization: Bearer {{auth_token}}
 
@@ -17,9 +17,8 @@ Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-  "name": "tag 1",
-  "color": "white",
-  "user_uuid": "60696063d630d91586d2ed85"
+  "name": "tag 3",
+  "color": "black"
 }
 
 ### Update tag
@@ -34,6 +33,6 @@ Authorization: Bearer {{auth_token}}
 
 ### Delete tag
 
-DELETE http://localhost:8080/api/tags/1
+DELETE http://localhost:8080/api/tags/3
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}

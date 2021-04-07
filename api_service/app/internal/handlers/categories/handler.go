@@ -30,16 +30,17 @@ func (h *Handler) Register(router *httprouter.Router) {
 }
 
 func (h *Handler) GetCategories(w http.ResponseWriter, r *http.Request) error {
+	w.Header().Set("Content-Type", "application/json")
+
 	if r.Context().Value("user_uuid") == nil {
 		h.Logger.Error("there is no user_uuid in context")
-		return apperror.UnauthorizedError("unauthorized")
+		return apperror.UnauthorizedError("")
 	}
 	userUuid := r.Context().Value("user_uuid").(string)
 	categories, err := h.CategoryService.GetUserCategories(context.Background(), userUuid)
 	if err != nil {
 		return err
 	}
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(categories)
 
@@ -47,19 +48,20 @@ func (h *Handler) GetCategories(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (h *Handler) CreateCategory(w http.ResponseWriter, r *http.Request) error {
+	w.Header().Set("Content-Type", "application/json")
+
 	if r.Context().Value("user_uuid") == nil {
 		h.Logger.Error("there is no user_uuid in context")
-		return apperror.UnauthorizedError("unauthorized")
+		return apperror.UnauthorizedError("")
 	}
 	userUuid := r.Context().Value("user_uuid").(string)
 
 	var crCategory category_service.CreateCategoryDTO
 	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&crCategory); err != nil {
-		return apperror.BadRequestError("failed to decode data")
+		return apperror.BadRequestError("can't decode")
 	}
 	crCategory.UserUuid = userUuid
-	w.Header().Set("Content-Type", "application/json")
 
 	categoryUuid, err := h.CategoryService.CreateCategory(context.Background(), crCategory)
 	if err != nil {
@@ -72,9 +74,11 @@ func (h *Handler) CreateCategory(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (h *Handler) PartiallyUpdateCategory(w http.ResponseWriter, r *http.Request) error {
+	w.Header().Set("Content-Type", "application/json")
+
 	if r.Context().Value("user_uuid") == nil {
 		h.Logger.Error("there is no user_uuid in context")
-		return apperror.UnauthorizedError("unauthorized")
+		return apperror.UnauthorizedError("")
 	}
 	userUuid := r.Context().Value("user_uuid").(string)
 
@@ -83,7 +87,7 @@ func (h *Handler) PartiallyUpdateCategory(w http.ResponseWriter, r *http.Request
 	var categoryDTO category_service.UpdateCategoryDTO
 	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&categoryDTO); err != nil {
-		return apperror.BadRequestError("failed to decode data")
+		return apperror.BadRequestError("can't decode")
 	}
 	categoryDTO.UserUuid = userUuid
 	err := h.CategoryService.UpdateCategory(context.Background(), categoryUuid, categoryDTO)
@@ -96,9 +100,11 @@ func (h *Handler) PartiallyUpdateCategory(w http.ResponseWriter, r *http.Request
 }
 
 func (h *Handler) DeleteCategory(w http.ResponseWriter, r *http.Request) error {
+	w.Header().Set("Content-Type", "application/json")
+
 	if r.Context().Value("user_uuid") == nil {
 		h.Logger.Error("there is no user_uuid in context")
-		return apperror.UnauthorizedError("unauthorized")
+		return apperror.UnauthorizedError("")
 	}
 
 	params := r.Context().Value(httprouter.ParamsKey).(httprouter.Params)

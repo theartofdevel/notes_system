@@ -29,6 +29,8 @@ func (h *Handler) Register(router *httprouter.Router) {
 }
 
 func (h *Handler) Signup(w http.ResponseWriter, r *http.Request) error {
+	w.Header().Set("Content-Type", "application/json")
+
 	defer r.Body.Close()
 	var dto user_service.CreateUserDTO
 	if err := json.NewDecoder(r.Body).Decode(&dto); err != nil {
@@ -44,7 +46,6 @@ func (h *Handler) Signup(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	w.Write(token)
 
@@ -52,6 +53,8 @@ func (h *Handler) Signup(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (h *Handler) Auth(w http.ResponseWriter, r *http.Request) error {
+	w.Header().Set("Content-Type", "application/json")
+
 	var token []byte
 	var err error
 	switch r.Method {
@@ -81,7 +84,6 @@ func (h *Handler) Auth(w http.ResponseWriter, r *http.Request) error {
 		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	w.Write(token)
 

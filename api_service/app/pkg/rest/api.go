@@ -32,8 +32,8 @@ func (ar *APIResponse) Location() (*url.URL, error) {
 }
 
 type APIError struct {
-	Message          string `json:"message,omitempty"`
-	ErrorCode        string `json:"code,omitempty"`
+	Message          string `json:"error,omitempty"`
+	ErrorCode        string `json:"error_code,omitempty"`
 	DeveloperMessage string `json:"developer_message,omitempty"`
 }
 

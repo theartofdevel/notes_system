@@ -7,9 +7,9 @@ type CreateCategoryDTO struct {
 }
 
 type UpdateCategoryDTO struct {
-	Uuid       string `json:"uuid"`
-	Name       string `json:"name"`
-	UserUuid   string `json:"user_uuid"`
+	Uuid       string `json:"uuid,omitempty"`
+	Name       string `json:"name,omitempty"`
+	UserUuid   string `json:"user_uuid,omitempty"`
 	ParentUuid string `json:"parent_uuid,omitempty"`
 }
 

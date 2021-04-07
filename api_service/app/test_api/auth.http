@@ -1,9 +1,11 @@
+### Auth
+
 POST http://localhost:8080/api/auth
 Content-Type: application/json
 
 {
-  "username": "me",
-  "password": "pass"
+  "email": "858683@gmail.com",
+  "password": "12345"
 }
 
 > {%
@@ -11,15 +13,15 @@ client.global.set("auth_token", response.body.token)
 client.global.set("refresh_token", response.body.refresh_token)
 %}
 
-###
+### Signup
 
 POST http://localhost:8080/api/signup
 Content-Type: application/json
 
 {
-  "username": "me",
-  "password": "pass",
-  "email": "email@me.here"
+  "email": "858683@gmail.com",
+  "password": "12345",
+  "repeat_password": "12345"
 }
 
 > {%
@@ -27,7 +29,7 @@ client.global.set("auth_token", response.body.token)
 client.global.set("refresh_token", response.body.refresh_token)
 %}
 
-###
+### Refresh token
 
 PUT http://localhost:8080/api/auth
 Content-Type: application/json

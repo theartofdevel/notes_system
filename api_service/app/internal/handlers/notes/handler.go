@@ -1,101 +1,115 @@
 package notes
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
+	"github.com/theartofdevel/notes_system/api_service/internal/apperror"
+	"github.com/theartofdevel/notes_system/api_service/internal/client/note_service"
+	"github.com/theartofdevel/notes_system/api_service/pkg/jwt"
 	"github.com/theartofdevel/notes_system/api_service/pkg/logging"
-	"github.com/theartofdevel/notes_system/api_service/pkg/middleware/jwt"
 	"net/http"
 )
 
 const (
 	notesURL = "/api/notes"
-	noteURL = "/api/notes/:uuid"
+	noteURL  = "/api/notes/:uuid"
 )
 
-type note struct {
-	Uuid        string `json:"uuid"`
-	Header      string `json:"header"`
-	Body        string `json:"body"`
-	CreatedDate int    `json:"created_date,omitempty"`
-	CategoryId  string `json:"category_id"`
-}
-
-type createNote struct {
-	note
-	UserId string `json:"user_id,omitempty"`
-}
-
 type Handler struct {
-	Logger logging.Logger
+	Logger      logging.Logger
+	NoteService note_service.NoteService
 }
 
 func (h *Handler) Register(router *httprouter.Router) {
-	router.HandlerFunc(http.MethodGet, notesURL, jwt.Middleware(h.GetNotes))
-	router.HandlerFunc(http.MethodPost, notesURL, jwt.Middleware(h.CreateNote))
-	router.HandlerFunc(http.MethodGet, noteURL, jwt.Middleware(h.GetNoteByUuid))
-	router.HandlerFunc(http.MethodPatch, noteURL, jwt.Middleware(h.PartiallyUpdateNote))
-	router.HandlerFunc(http.MethodDelete, noteURL, jwt.Middleware(h.DeleteNote))
+	router.HandlerFunc(http.MethodGet, notesURL, jwt.Middleware(apperror.Middleware(h.GetNotes)))
+	router.HandlerFunc(http.MethodPost, notesURL, jwt.Middleware(apperror.Middleware(h.CreateNote)))
+	router.HandlerFunc(http.MethodGet, noteURL, jwt.Middleware(apperror.Middleware(h.GetNoteByUuid)))
+	router.HandlerFunc(http.MethodPatch, noteURL, jwt.Middleware(apperror.Middleware(h.PartiallyUpdateNote)))
+	router.HandlerFunc(http.MethodDelete, noteURL, jwt.Middleware(apperror.Middleware(h.DeleteNote)))
 }
 
-func (h *Handler) GetNotes(w http.ResponseWriter, r *http.Request) {
-	userId := r.Context().Value("user_id").(string)
-	// TODO call NoteService
+func (h *Handler) GetNotes(w http.ResponseWriter, r *http.Request) error {
 	w.Header().Set("Content-Type", "application/json")
+
+	categoryUUID := r.URL.Query().Get("category_uuid")
+	notes, err := h.NoteService.GetByCategoryUUID(context.Background(), categoryUUID)
+	if err != nil {
+		return err
+	}
+
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(userId))
+	w.Write(notes)
+
+	return nil
 }
 
-func (h *Handler) CreateNote(w http.ResponseWriter, r *http.Request) {
-	userId := r.Context().Value("user_id").(string)
-	var crNote createNote
+func (h *Handler) CreateNote(w http.ResponseWriter, r *http.Request) error {
+	w.Header().Set("Content-Type", "application/json")
+
+	defer r.Body.Close()
+	var crNote note_service.CreateNoteDTO
 	if err := json.NewDecoder(r.Body).Decode(&crNote); err != nil {
-		h.Logger.Error(err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		return apperror.BadRequestError("can't decode")
 	}
-	defer r.Body.Close()
-	crNote.UserId = userId
-	// TODO call NoteService
+
+	noteUUID, err := h.NoteService.Create(context.Background(), crNote)
+	if err != nil {
+		return err
+	}
+
 	w.WriteHeader(http.StatusCreated)
-	// TODO set real note uuid
-	w.Header().Set("Location", fmt.Sprintf("%s/%s", notesURL, "note_uuid"))
+	w.Header().Set("Location", fmt.Sprintf("%s/%s", notesURL, noteUUID))
+
+	return nil
 }
 
-func (h *Handler) GetNoteByUuid(w http.ResponseWriter, r *http.Request) {
-	userId := r.Context().Value("user_id").(string)
-	// TODO call NoteService
+func (h *Handler) GetNoteByUuid(w http.ResponseWriter, r *http.Request) error {
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(userId))
-}
 
-func (h *Handler) PartiallyUpdateNote(w http.ResponseWriter, r *http.Request) {
-	userId := r.Context().Value("user_id").(string)
 	params := r.Context().Value(httprouter.ParamsKey).(httprouter.Params)
 	noteUuid := params.ByName("uuid")
-	var n note
-	if err := json.NewDecoder(r.Body).Decode(&n); err != nil {
-		h.Logger.Error(err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
+
+	note, err := h.NoteService.GetByUUID(context.Background(), noteUuid)
+	if err != nil {
+		return err
 	}
-	defer r.Body.Close()
-	n.Uuid = noteUuid
-	// TODO call NoteService
-	w.WriteHeader(http.StatusNoContent)
-	// del it
-	w.Write([]byte(userId))
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(note)
+
+	return nil
 }
 
-func (h *Handler) DeleteNote(w http.ResponseWriter, r *http.Request) {
-	userId := r.Context().Value("user_id").(string)
+func (h *Handler) PartiallyUpdateNote(w http.ResponseWriter, r *http.Request) error {
+	w.Header().Set("Content-Type", "application/json")
+
 	params := r.Context().Value(httprouter.ParamsKey).(httprouter.Params)
-	noteUuid := params.ByName("uuid")
-	// TODO call NoteService
+	noteUUID := params.ByName("uuid")
+
+	var dto note_service.UpdateNoteDTO
+	defer r.Body.Close()
+	if err := json.NewDecoder(r.Body).Decode(&dto); err != nil {
+		return apperror.BadRequestError("can't decode")
+	}
+	if err := h.NoteService.Update(context.Background(), noteUUID, dto); err != nil {
+		return err
+	}
 	w.WriteHeader(http.StatusNoContent)
-	// del it
-	w.Write([]byte(userId))
-	w.Write([]byte(noteUuid))
+
+	return nil
+}
+
+func (h *Handler) DeleteNote(w http.ResponseWriter, r *http.Request) error {
+	w.Header().Set("Content-Type", "application/json")
+
+	params := r.Context().Value(httprouter.ParamsKey).(httprouter.Params)
+	noteUUID := params.ByName("uuid")
+	if err := h.NoteService.Delete(context.Background(), noteUUID); err != nil {
+		return err
+	}
+	w.WriteHeader(http.StatusNoContent)
+
+	return nil
 }
