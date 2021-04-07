@@ -125,7 +125,7 @@ func (h *Handler) PartiallyUpdateNote(w http.ResponseWriter, r *http.Request) er
 	if err := json.Unmarshal(bodyBytes, &noteDTO); err != nil {
 		return err
 	}
-	var tagsUpdate bool
+	tagsUpdate := len(noteDTO.Tags) != 0
 	if len(noteDTO.Tags) == 0 {
 		h.Logger.Debug("unmarshal body bytes to map")
 		var data map[string]interface{}
