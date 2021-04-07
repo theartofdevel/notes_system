@@ -14,7 +14,6 @@ class CreateCategoryDTO(Base):
 class UpdateCategoryDTO(Base):
     name: str
     user_uuid: str
-    parent_uuid: str = None
     uuid: str = None
 
 
