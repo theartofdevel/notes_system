@@ -1,7 +1,6 @@
 package note
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
@@ -40,7 +39,7 @@ func (h *Handler) GetNote(w http.ResponseWriter, r *http.Request) error {
 		return apperror.BadRequestError("uuid query parameter is required and must be a comma separated integers")
 	}
 
-	note, err := h.NoteService.GetOne(context.Background(), noteUUID)
+	note, err := h.NoteService.GetOne(r.Context(), noteUUID)
 	if err != nil {
 		return err
 	}
@@ -65,7 +64,7 @@ func (h *Handler) GetNotesByCategory(w http.ResponseWriter, r *http.Request) err
 		return apperror.BadRequestError("category_uuid query parameter is required and must be a comma separated integers")
 	}
 
-	notes, err := h.NoteService.GetByCategoryUUID(context.Background(), categoryUUID)
+	notes, err := h.NoteService.GetByCategoryUUID(r.Context(), categoryUUID)
 	if err != nil {
 		return err
 	}
@@ -89,10 +88,10 @@ func (h *Handler) CreateNote(w http.ResponseWriter, r *http.Request) error {
 	var crNote CreateNoteDTO
 	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&crNote); err != nil {
-		return err
+		return apperror.BadRequestError("invalid data")
 	}
 
-	noteUUID, err := h.NoteService.Create(context.Background(), crNote)
+	noteUUID, err := h.NoteService.Create(r.Context(), crNote)
 	if err != nil {
 		return err
 	}
@@ -138,7 +137,7 @@ func (h *Handler) PartiallyUpdateNote(w http.ResponseWriter, r *http.Request) er
 		}
 	}
 
-	err = h.NoteService.Update(context.Background(), noteUUID, noteDTO, tagsUpdate)
+	err = h.NoteService.Update(r.Context(), noteUUID, noteDTO, tagsUpdate)
 	if err != nil {
 		return err
 	}
@@ -158,7 +157,7 @@ func (h *Handler) DeleteNote(w http.ResponseWriter, r *http.Request) error {
 		return apperror.BadRequestError("uuid query parameter is required and must be a comma separated integers")
 	}
 
-	err := h.NoteService.Delete(context.Background(), noteUUID)
+	err := h.NoteService.Delete(r.Context(), noteUUID)
 	if err != nil {
 		return err
 	}

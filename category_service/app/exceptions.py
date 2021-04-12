@@ -2,9 +2,9 @@ from enum import Enum
 
 
 class AppError(Enum):
-    def __init__(self, error_code: str, error: str, developer_message: str):
-        self.error_code = error_code
-        self.error = error
+    def __init__(self, code: str, message: str, developer_message: str):
+        self.code = code
+        self.message = message
         self.developer_message = developer_message
 
     SYSTEM_ERROR = ("CS-00001", "system error", "")
@@ -16,19 +16,19 @@ class AppError(Enum):
 class AppException(Exception):
     def __init__(self,
                  exc_data: AppError = None,
-                 error_code: str = None,
+                 code: str = None,
                  error: str = None,
                  developer_message: str = None,
                  *args):
         if exc_data:
-            self.error_code = exc_data.error_code
-            self.error = exc_data.error
+            self.code = exc_data.code
+            self.message = exc_data.message
             self.developer_message = exc_data.developer_message
 
-        if error_code:
-            self.error_code = error_code
+        if code:
+            self.code = code
         if error:
-            self.error = error
+            self.message = error
         if developer_message:
             self.developer_message = developer_message
 
@@ -37,6 +37,7 @@ class AppException(Exception):
 
 class NotFoundException(AppException):
     pass
+
 
 class ValidationException(AppException):
     pass

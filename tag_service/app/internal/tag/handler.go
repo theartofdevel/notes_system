@@ -1,7 +1,6 @@
 package tag
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
@@ -42,7 +41,7 @@ func (h *Handler) GetTag(w http.ResponseWriter, r *http.Request) error {
 		return apperror.BadRequestError("id resource identifier is required and must be an integer")
 	}
 
-	tag, err := h.TagService.GetOne(context.Background(), id)
+	tag, err := h.TagService.GetOne(r.Context(), id)
 	if err != nil {
 		return err
 	}
@@ -80,7 +79,7 @@ func (h *Handler) GetTags(w http.ResponseWriter, r *http.Request) error {
 		tagsIds = append(tagsIds, id)
 	}
 
-	tags, err := h.TagService.GetMany(context.Background(), tagsIds)
+	tags, err := h.TagService.GetMany(r.Context(), tagsIds)
 	if err != nil {
 		return err
 	}
@@ -108,7 +107,7 @@ func (h *Handler) CreateTag(w http.ResponseWriter, r *http.Request) error {
 		return apperror.BadRequestError("invalid JSON scheme")
 	}
 
-	tagID, err := h.TagService.Create(context.Background(), crTag)
+	tagID, err := h.TagService.Create(r.Context(), crTag)
 	if err != nil {
 		return err
 	}
@@ -140,7 +139,7 @@ func (h *Handler) PartiallyUpdateTag(w http.ResponseWriter, r *http.Request) err
 		return apperror.BadRequestError("invalid JSON scheme")
 	}
 
-	err = h.TagService.Update(context.Background(), tagID, tagDTO)
+	err = h.TagService.Update(r.Context(), tagID, tagDTO)
 	if err != nil {
 		return err
 	}
@@ -163,7 +162,7 @@ func (h *Handler) DeleteTag(w http.ResponseWriter, r *http.Request) error {
 		return apperror.BadRequestError("id query parameter is required and must be a comma separated integers")
 	}
 
-	err = h.TagService.Delete(context.Background(), tagID)
+	err = h.TagService.Delete(r.Context(), tagID)
 	if err != nil {
 		return err
 	}

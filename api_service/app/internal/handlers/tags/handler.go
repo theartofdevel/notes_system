@@ -1,7 +1,6 @@
 package tags
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
@@ -42,7 +41,7 @@ func (h *Handler) GetTag(w http.ResponseWriter, r *http.Request) error {
 		return apperror.BadRequestError("invalid id")
 	}
 
-	tag, err := h.TagService.GetOne(context.Background(), id)
+	tag, err := h.TagService.GetOne(r.Context(), id)
 	if err != nil {
 		return err
 	}
@@ -71,7 +70,7 @@ func (h *Handler) GetManyTags(w http.ResponseWriter, r *http.Request) error {
 		tagsIds = append(tagsIds, id)
 	}
 
-	tags, err := h.TagService.GetMany(context.Background(), tagsIds)
+	tags, err := h.TagService.GetMany(r.Context(), tagsIds)
 	if err != nil {
 		return err
 	}
@@ -102,7 +101,7 @@ func (h *Handler) CreateTag(w http.ResponseWriter, r *http.Request) error {
 	}
 	dto.UserUUID = userUUID
 
-	tagID, err := h.TagService.Create(context.Background(), dto)
+	tagID, err := h.TagService.Create(r.Context(), dto)
 	if err != nil {
 		return err
 	}
@@ -131,7 +130,7 @@ func (h *Handler) PartiallyUpdateTag(w http.ResponseWriter, r *http.Request) err
 		return apperror.BadRequestError("can't decode")
 	}
 	dto.UserUUID = userUUID
-	if err := h.TagService.Update(context.Background(), tagId, dto); err != nil {
+	if err := h.TagService.Update(r.Context(), tagId, dto); err != nil {
 		return err
 	}
 
@@ -150,7 +149,7 @@ func (h *Handler) DeleteTag(w http.ResponseWriter, r *http.Request) error {
 
 	params := r.Context().Value(httprouter.ParamsKey).(httprouter.Params)
 	tagId := params.ByName("id")
-	if err := h.TagService.Delete(context.Background(), tagId); err != nil {
+	if err := h.TagService.Delete(r.Context(), tagId); err != nil {
 		return err
 	}
 	w.WriteHeader(http.StatusNoContent)

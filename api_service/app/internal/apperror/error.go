@@ -11,7 +11,7 @@ var (
 
 type AppError struct {
 	Err              error  `json:"-"`
-	Message          string `json:"error,omitempty"`
+	Message          string `json:"message,omitempty"`
 	DeveloperMessage string `json:"developer_message,omitempty"`
 	Code             string `json:"code,omitempty"`
 }

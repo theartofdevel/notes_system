@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"context"
 	"encoding/json"
 	"github.com/julienschmidt/httprouter"
 	"github.com/theartofdevel/notes_system/api_service/internal/apperror"
@@ -37,7 +36,7 @@ func (h *Handler) Signup(w http.ResponseWriter, r *http.Request) error {
 		return apperror.BadRequestError("failed to decode data")
 	}
 
-	u, err := h.UserService.Create(context.Background(), dto)
+	u, err := h.UserService.Create(r.Context(), dto)
 	if err != nil {
 		return err
 	}
@@ -64,7 +63,7 @@ func (h *Handler) Auth(w http.ResponseWriter, r *http.Request) error {
 		if err := json.NewDecoder(r.Body).Decode(&dto); err != nil {
 			return apperror.BadRequestError("failed to decode data")
 		}
-		u, err := h.UserService.GetByEmailAndPassword(context.Background(), dto.Email, dto.Password)
+		u, err := h.UserService.GetByEmailAndPassword(r.Context(), dto.Email, dto.Password)
 		if err != nil {
 			return err
 		}

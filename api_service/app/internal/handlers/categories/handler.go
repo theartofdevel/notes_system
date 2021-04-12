@@ -1,7 +1,6 @@
 package categories
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
@@ -37,7 +36,7 @@ func (h *Handler) GetCategories(w http.ResponseWriter, r *http.Request) error {
 		return apperror.UnauthorizedError("")
 	}
 	userUuid := r.Context().Value("user_uuid").(string)
-	categories, err := h.CategoryService.GetUserCategories(context.Background(), userUuid)
+	categories, err := h.CategoryService.GetUserCategories(r.Context(), userUuid)
 	if err != nil {
 		return err
 	}
@@ -63,7 +62,7 @@ func (h *Handler) CreateCategory(w http.ResponseWriter, r *http.Request) error {
 	}
 	crCategory.UserUuid = userUuid
 
-	categoryUuid, err := h.CategoryService.CreateCategory(context.Background(), crCategory)
+	categoryUuid, err := h.CategoryService.CreateCategory(r.Context(), crCategory)
 	if err != nil {
 		return err
 	}
@@ -90,7 +89,7 @@ func (h *Handler) PartiallyUpdateCategory(w http.ResponseWriter, r *http.Request
 		return apperror.BadRequestError("can't decode")
 	}
 	categoryDTO.UserUuid = userUuid
-	err := h.CategoryService.UpdateCategory(context.Background(), categoryUuid, categoryDTO)
+	err := h.CategoryService.UpdateCategory(r.Context(), categoryUuid, categoryDTO)
 	if err != nil {
 		return err
 	}
@@ -112,7 +111,7 @@ func (h *Handler) DeleteCategory(w http.ResponseWriter, r *http.Request) error {
 		Uuid:     params.ByName("uuid"),
 		UserUuid: r.Context().Value("user_uuid").(string),
 	}
-	err := h.CategoryService.DeleteCategory(context.Background(), categoryDTO)
+	err := h.CategoryService.DeleteCategory(r.Context(), categoryDTO)
 	if err != nil {
 		return err
 	}

@@ -1,7 +1,6 @@
 package notes
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
@@ -34,7 +33,7 @@ func (h *Handler) GetNotes(w http.ResponseWriter, r *http.Request) error {
 	w.Header().Set("Content-Type", "application/json")
 
 	categoryUUID := r.URL.Query().Get("category_uuid")
-	notes, err := h.NoteService.GetByCategoryUUID(context.Background(), categoryUUID)
+	notes, err := h.NoteService.GetByCategoryUUID(r.Context(), categoryUUID)
 	if err != nil {
 		return err
 	}
@@ -54,7 +53,7 @@ func (h *Handler) CreateNote(w http.ResponseWriter, r *http.Request) error {
 		return apperror.BadRequestError("can't decode")
 	}
 
-	noteUUID, err := h.NoteService.Create(context.Background(), crNote)
+	noteUUID, err := h.NoteService.Create(r.Context(), crNote)
 	if err != nil {
 		return err
 	}
@@ -71,7 +70,7 @@ func (h *Handler) GetNoteByUuid(w http.ResponseWriter, r *http.Request) error {
 	params := r.Context().Value(httprouter.ParamsKey).(httprouter.Params)
 	noteUuid := params.ByName("uuid")
 
-	note, err := h.NoteService.GetByUUID(context.Background(), noteUuid)
+	note, err := h.NoteService.GetByUUID(r.Context(), noteUuid)
 	if err != nil {
 		return err
 	}
@@ -93,7 +92,7 @@ func (h *Handler) PartiallyUpdateNote(w http.ResponseWriter, r *http.Request) er
 	if err := json.NewDecoder(r.Body).Decode(&dto); err != nil {
 		return apperror.BadRequestError("can't decode")
 	}
-	if err := h.NoteService.Update(context.Background(), noteUUID, dto); err != nil {
+	if err := h.NoteService.Update(r.Context(), noteUUID, dto); err != nil {
 		return err
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -106,7 +105,7 @@ func (h *Handler) DeleteNote(w http.ResponseWriter, r *http.Request) error {
 
 	params := r.Context().Value(httprouter.ParamsKey).(httprouter.Params)
 	noteUUID := params.ByName("uuid")
-	if err := h.NoteService.Delete(context.Background(), noteUUID); err != nil {
+	if err := h.NoteService.Delete(r.Context(), noteUUID); err != nil {
 		return err
 	}
 	w.WriteHeader(http.StatusNoContent)

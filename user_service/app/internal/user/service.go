@@ -89,7 +89,7 @@ func (s service) Update(ctx context.Context, uuid string, dto UpdateUserDTO) err
 	s.logger.Debug("compare old and new passwords")
 	if dto.OldPassword != dto.NewPassword || dto.NewPassword == "" {
 		s.logger.Debug("get user by uuid")
-		user, err := s.GetOne(context.Background(), uuid)
+		user, err := s.GetOne(ctx, uuid)
 		if err != nil {
 			return err
 		}

@@ -1,7 +1,6 @@
 package user
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
@@ -36,7 +35,7 @@ func (h *Handler) GetUser(w http.ResponseWriter, r *http.Request) error {
 	params := r.Context().Value(httprouter.ParamsKey).(httprouter.Params)
 	userUUID := params.ByName("uuid")
 
-	user, err := h.UserService.GetOne(context.Background(), userUUID)
+	user, err := h.UserService.GetOne(r.Context(), userUUID)
 	if err != nil {
 		return err
 	}
@@ -63,7 +62,7 @@ func (h *Handler) GetUserByEmailAndPassword(w http.ResponseWriter, r *http.Reque
 		return apperror.BadRequestError("invalid query parameters email or password")
 	}
 
-	user, err := h.UserService.GetByEmailAndPassword(context.Background(), email, password)
+	user, err := h.UserService.GetByEmailAndPassword(r.Context(), email, password)
 	if err != nil {
 		return err
 	}
@@ -91,7 +90,7 @@ func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) error {
 		return apperror.BadRequestError("invalid JSON scheme. check swagger API")
 	}
 
-	userUUID, err := h.UserService.Create(context.Background(), crUser)
+	userUUID, err := h.UserService.Create(r.Context(), crUser)
 	if err != nil {
 		return err
 	}
@@ -115,7 +114,7 @@ func (h *Handler) PartiallyUpdateUser(w http.ResponseWriter, r *http.Request) er
 		return apperror.BadRequestError("invalid JSON scheme. check swagger API")
 	}
 
-	err := h.UserService.Update(context.Background(), userUUID, updUser)
+	err := h.UserService.Update(r.Context(), userUUID, updUser)
 	if err != nil {
 		return err
 	}
@@ -132,7 +131,7 @@ func (h *Handler) DeleteUser(w http.ResponseWriter, r *http.Request) error {
 	params := r.Context().Value(httprouter.ParamsKey).(httprouter.Params)
 	userUUID := params.ByName("uuid")
 
-	err := h.UserService.Delete(context.Background(), userUUID)
+	err := h.UserService.Delete(r.Context(), userUUID)
 	if err != nil {
 		return err
 	}
