@@ -18,12 +18,12 @@ var _ TagService = &client{}
 
 type client struct {
 	base     rest.BaseClient
-	Resource string
+	resource string
 }
 
 func NewService(baseURL string, resource string, logger logging.Logger) TagService {
 	return &client{
-		Resource: resource,
+		resource: resource,
 		base: rest.BaseClient{
 			BaseURL: baseURL,
 			HTTPClient: &http.Client{
@@ -46,7 +46,7 @@ func (c *client) GetOne(ctx context.Context, id int) ([]byte, error) {
 	var tags []byte
 
 	c.base.Logger.Debug("build url with resource and filter")
-	uri, err := c.base.BuildURL(fmt.Sprintf("%s/%d", c.Resource, id), nil)
+	uri, err := c.base.BuildURL(fmt.Sprintf("%s/%d", c.resource, id), nil)
 	if err != nil {
 		return tags, fmt.Errorf("failed to build URL. error: %v", err)
 	}
@@ -89,7 +89,7 @@ func (c *client) GetMany(ctx context.Context, ids []int) ([]byte, error) {
 	}
 
 	c.base.Logger.Debug("build url with resource and filter")
-	uri, err := c.base.BuildURL(c.Resource, filters)
+	uri, err := c.base.BuildURL(c.resource, filters)
 	if err != nil {
 		return tags, fmt.Errorf("failed to build URL. error: %v", err)
 	}
@@ -125,7 +125,7 @@ func (c *client) Create(ctx context.Context, tag CreateTagDTO) (string, error) {
 	var tagUUID string
 
 	c.base.Logger.Debug("build url with resource and filter")
-	uri, err := c.base.BuildURL(c.Resource, nil)
+	uri, err := c.base.BuildURL(c.resource, nil)
 	if err != nil {
 		return tagUUID, fmt.Errorf("failed to build URL. error: %v", err)
 	}
@@ -173,7 +173,7 @@ func (c *client) Create(ctx context.Context, tag CreateTagDTO) (string, error) {
 
 func (c *client) Update(ctx context.Context, uuid string, tag UpdateTagDTO) error {
 	c.base.Logger.Debug("build url with resource and filter")
-	uri, err := c.base.BuildURL(fmt.Sprintf("%s/%s", c.Resource, uuid), nil)
+	uri, err := c.base.BuildURL(fmt.Sprintf("%s/%s", c.resource, uuid), nil)
 	if err != nil {
 		return fmt.Errorf("failed to build URL. error: %v", err)
 	}
@@ -212,7 +212,7 @@ func (c *client) Update(ctx context.Context, uuid string, tag UpdateTagDTO) erro
 
 func (c *client) Delete(ctx context.Context, id string) error {
 	c.base.Logger.Debug("build url with resource and filter")
-	uri, err := c.base.BuildURL(fmt.Sprintf("%s/%s", c.Resource, id), nil)
+	uri, err := c.base.BuildURL(fmt.Sprintf("%s/%s", c.resource, id), nil)
 	if err != nil {
 		return fmt.Errorf("failed to build URL. error: %v", err)
 	}

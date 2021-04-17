@@ -43,9 +43,7 @@ type UserService interface {
 	Delete(ctx context.Context, uuid string) error
 }
 
-func (c *client) GetByEmailAndPassword(ctx context.Context, email, password string) (User, error) {
-	var u User
-
+func (c *client) GetByEmailAndPassword(ctx context.Context, email, password string) (u User, err error) {
 	c.base.Logger.Debug("add email and password to filter options")
 	filters := []rest.FilterOptions{
 		{
@@ -66,7 +64,7 @@ func (c *client) GetByEmailAndPassword(ctx context.Context, email, password stri
 	c.base.Logger.Tracef("url: %s", uri)
 
 	c.base.Logger.Debug("create new request")
-	req, err := http.NewRequest("GET", uri, nil)
+	req, err := http.NewRequest(http.MethodGet, uri, nil)
 	if err != nil {
 		return u, fmt.Errorf("failed to create new request due to error: %w", err)
 	}
@@ -146,7 +144,7 @@ func (c *client) Create(ctx context.Context, dto CreateUserDTO) (User, error) {
 	}
 
 	c.base.Logger.Debug("create new request")
-	req, err := http.NewRequest("POST", uri, bytes.NewBuffer(dataBytes))
+	req, err := http.NewRequest(http.MethodPost, uri, bytes.NewBuffer(dataBytes))
 	if err != nil {
 		return u, fmt.Errorf("failed to create new request due to error: %w", err)
 	}
@@ -198,7 +196,7 @@ func (c *client) Update(ctx context.Context, uuid string, dto UpdateUserDTO) err
 	}
 
 	c.base.Logger.Debug("create new request")
-	req, err := http.NewRequest("PATCH", uri, bytes.NewBuffer(dataBytes))
+	req, err := http.NewRequest(http.MethodPatch, uri, bytes.NewBuffer(dataBytes))
 	if err != nil {
 		return fmt.Errorf("failed to create new request due to error: %w", err)
 	}

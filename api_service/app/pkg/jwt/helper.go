@@ -37,7 +37,7 @@ type Helper interface {
 }
 
 func (h *helper) UpdateRefreshToken(rt RT) ([]byte, error) {
-	h.RTCache.Del([]byte(rt.RefreshToken))
+	defer h.RTCache.Del([]byte(rt.RefreshToken))
 
 	userBytes, err := h.RTCache.Get([]byte(rt.RefreshToken))
 	if err != nil {
