@@ -1,0 +1,7 @@
+---
+
+is_debug: true
+minio:
+  endpoint: "localhost:9000"
+  access_key: "minio"
+  secret_key: "minio123"
