@@ -84,3 +84,5 @@ gopkg.in/yaml.v2 v2.2.8 h1:obN1ZagJSUGI0Ek/LBmuj4SNLPfIny3KsKFopxRdj10=
 gopkg.in/yaml.v2 v2.2.8/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 olympos.io/encoding/edn v0.0.0-20200308123125-93e3b8dd0e24 h1:sreVOrDp0/ezb0CHKVek/l7YwpxPJqv+jT3izfSphA4=
 olympos.io/encoding/edn v0.0.0-20200308123125-93e3b8dd0e24/go.mod h1:oVgVk4OWVDi43qWBEyGhXgYxt7+ED4iYNpTngSLX2Iw=
+pkg.re/essentialkaos/translit.v2 v2.0.1+incompatible h1:x3kCmTHtUE/jjeVi3ztR3xson1EPIGZxgyNNKtHod2c=
+pkg.re/essentialkaos/translit.v2 v2.0.1+incompatible/go.mod h1:lnmyL1FRqmxQgnZ2wJuGo0k6gpbi42Ke7ToM8+wjrR8=

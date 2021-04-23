@@ -10,6 +10,12 @@ import (
 	"time"
 )
 
+type Object struct {
+	ID   string
+	Size int64
+	Tags map[string]string
+}
+
 type Client struct {
 	logger      logging.Logger
 	minioClient *minio.Client
@@ -30,13 +36,13 @@ func NewClient(endpoint, accessKeyID, secretAccessKey string, logger logging.Log
 	}, nil
 }
 
-func (c *Client) GetFile(ctx context.Context, bucketName, fileName string) (*minio.Object, error) {
+func (c *Client) GetFile(ctx context.Context, bucketName, fileId string) (*minio.Object, error) {
 	reqCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	obj, err := c.minioClient.GetObject(reqCtx, bucketName, fileName, minio.GetObjectOptions{})
+	obj, err := c.minioClient.GetObject(reqCtx, bucketName, fileId, minio.GetObjectOptions{})
 	if err != nil {
-		return nil, fmt.Errorf("failed to get file with name: %s from minio bucket %s. err: %w", fileName, bucketName, err)
+		return nil, fmt.Errorf("failed to get file with id: %s from minio bucket %s. err: %w", fileId, bucketName, err)
 	}
 	return obj, nil
 }
@@ -61,22 +67,27 @@ func (c *Client) GetBucketFiles(ctx context.Context, bucketName string) ([]*mini
 	return files, nil
 }
 
-func (c *Client) UploadFile(ctx context.Context, fileName, bucketName string, fileSize int64, reader io.Reader) error {
+func (c *Client) UploadFile(ctx context.Context, fileId, fileName, bucketName string, fileSize int64, reader io.Reader) error {
 	reqCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 
 	exists, errBucketExists := c.minioClient.BucketExists(ctx, bucketName)
 	if errBucketExists != nil || !exists {
 		c.logger.Warnf("no bucket %s. creating new one...", bucketName)
-		err := c.minioClient.MakeBucket(ctx,bucketName, minio.MakeBucketOptions{})
+		err := c.minioClient.MakeBucket(ctx, bucketName, minio.MakeBucketOptions{})
 		if err != nil {
 			return fmt.Errorf("failed to create new bucket. err: %w", err)
 		}
 	}
 
 	c.logger.Debugf("put new object %s to bucket %s", fileName, bucketName)
-	_, err := c.minioClient.PutObject(reqCtx, bucketName, fileName, reader, fileSize,
-		minio.PutObjectOptions{ContentType: "application/octet-stream"})
+	_, err := c.minioClient.PutObject(reqCtx, bucketName, fileId, reader, fileSize,
+		minio.PutObjectOptions{
+			UserMetadata: map[string]string{
+				"Name": fileName,
+			},
+			ContentType: "application/octet-stream",
+		})
 	if err != nil {
 		return fmt.Errorf("failed to upload file. err: %w", err)
 	}
@@ -88,5 +99,5 @@ func (c *Client) DeleteFile(ctx context.Context, noteUUID, fileName string) erro
 	if err != nil {
 		return fmt.Errorf("failed to delete file. err: %w", err)
 	}
-	return  nil
+	return nil
 }

@@ -7,6 +7,7 @@ import (
 
 var (
 	ErrNotFound = NewAppError("not found", "FS-000010", "")
+	ErrAlreadyExist = NewAppError("already exists", "FS-000011", "")
 )
 
 type AppError struct {

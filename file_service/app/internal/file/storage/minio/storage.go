@@ -26,21 +26,31 @@ func NewStorage(endpoint, accessKeyID, secretAccessKey string, logger logging.Lo
 	}, nil
 }
 
-func (m *minioStorage) GetFile(ctx context.Context, bucketName, fileName string) (*file.File, error) {
-	obj, err := m.GetFile(ctx, bucketName, fileName)
+func (m *minioStorage) GetFile(ctx context.Context, bucketName, fileID string) (*file.File, error) {
+	obj, err := m.client.GetFile(ctx, bucketName, fileID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get file. err: %w", err)
 	}
+	objectInfo, err := obj.Stat()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get file. err: %w", err)
+	}
+	buffer := make([]byte, objectInfo.Size)
+	_, err = obj.Read(buffer)
+	if err != nil && err != io.EOF {
+		return nil, fmt.Errorf("failed to get objects. err: %w", err)
+	}
 	f := file.File{
-		Name:  obj.Name,
-		Size:  obj.Size,
-		Bytes: obj.Bytes,
+		ID:	   objectInfo.Key,
+		Name:  objectInfo.UserMetadata["Name"],
+		Size:  objectInfo.Size,
+		Bytes: buffer,
 	}
 	return &f, nil
 }
 
-func (m *minioStorage) GetFilesByNoteUUID(ctx context.Context, uuid string) ([]*file.File, error) {
-	objects, err := m.client.GetBucketFiles(ctx, uuid)
+func (m *minioStorage) GetFilesByNoteUUID(ctx context.Context, noteUUID string) ([]*file.File, error) {
+	objects, err := m.client.GetBucketFiles(ctx, noteUUID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get objects. err: %w", err)
 	}
@@ -62,7 +72,8 @@ func (m *minioStorage) GetFilesByNoteUUID(ctx context.Context, uuid string) ([]*
 			continue
 		}
 		f := file.File{
-			Name:  stat.Key,
+			ID:  stat.Key,
+			Name: stat.UserMetadata["Name"],
 			Size:  stat.Size,
 			Bytes: buffer,
 		}
@@ -73,16 +84,15 @@ func (m *minioStorage) GetFilesByNoteUUID(ctx context.Context, uuid string) ([]*
 }
 
 func (m *minioStorage) CreateFile(ctx context.Context, noteUUID string, file *file.File) error {
-
-	err := m.client.UploadFile(ctx, file.Name, noteUUID, file.Size, bytes.NewBuffer(file.Bytes))
+	err := m.client.UploadFile(ctx, file.ID, file.Name, noteUUID, file.Size, bytes.NewBuffer(file.Bytes))
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (m *minioStorage) DeleteFile(ctx context.Context, noteUUID, fileName string) error {
-	err := m.client.DeleteFile(ctx, noteUUID, fileName)
+func (m *minioStorage) DeleteFile(ctx context.Context, noteUUID, fileId string) error {
+	err := m.client.DeleteFile(ctx, noteUUID, fileId)
 	if err != nil {
 		return err
 	}

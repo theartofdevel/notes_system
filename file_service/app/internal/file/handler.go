@@ -23,7 +23,7 @@ func (h *Handler) Register(router *httprouter.Router) {
 	router.HandlerFunc(http.MethodGet, fileURL, apperror.Middleware(h.GetFile))
 	router.HandlerFunc(http.MethodGet, filesURL, apperror.Middleware(h.GetFilesByNoteUUID))
 	router.HandlerFunc(http.MethodPost, filesURL, apperror.Middleware(h.CreateFile))
-	router.HandlerFunc(http.MethodDelete, filesURL, apperror.Middleware(h.DeleteFile))
+	router.HandlerFunc(http.MethodDelete, fileURL, apperror.Middleware(h.DeleteFile))
 }
 
 func (h *Handler) GetFile(w http.ResponseWriter, r *http.Request) error {
@@ -114,18 +114,16 @@ func (h *Handler) DeleteFile(w http.ResponseWriter, r *http.Request) error {
 	h.Logger.Info("DELETE FILE")
 	w.Header().Set("Content-Type", "application/json")
 
-	var fileName string
-	defer r.Body.Close()
-	if err := json.NewDecoder(r.Body).Decode(&fileName); err != nil {
-		return apperror.BadRequestError("invalid data")
-	}
+	h.Logger.Debug("get name from context")
+	params := r.Context().Value(httprouter.ParamsKey).(httprouter.Params)
+	name := params.ByName("name")
 
 	noteUUID := r.URL.Query().Get("note_uuid")
 	if noteUUID == "" {
 		return apperror.BadRequestError("note_uuid query parameter is required")
 	}
 
-	err := h.FileService.Delete(r.Context(), noteUUID, fileName)
+	err := h.FileService.Delete(r.Context(), noteUUID, name)
 	if err != nil {
 		return err
 	}

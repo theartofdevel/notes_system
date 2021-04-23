@@ -43,6 +43,7 @@ func (s *service) GetFilesByNoteUUID(ctx context.Context, noteUUID string) ([]*F
 }
 
 func (s *service) Create(ctx context.Context, noteUUID string, dto CreateFileDTO) error {
+	dto.NormalizeName()
 	file, err := NewFile(dto)
 	if err != nil {
 		return err
