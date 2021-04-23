@@ -8,20 +8,15 @@ import (
 	"net/http"
 	"net/url"
 	"path"
-	"sync"
 )
 
 type BaseClient struct {
 	BaseURL    string
 	HTTPClient *http.Client
-	mu         sync.Mutex
 	Logger     logging.Logger
 }
 
 func (c *BaseClient) SendRequest(req *http.Request) (*APIResponse, error) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
 	if c.HTTPClient == nil {
 		return nil, errors.New("no http client")
 	}
@@ -72,9 +67,6 @@ func (c *BaseClient) BuildURL(resource string, filters []FilterOptions) (string,
 }
 
 func (c *BaseClient) Close() error {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
 	c.HTTPClient = nil
 	return nil
 }
