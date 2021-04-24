@@ -6,7 +6,6 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/theartofdevel/notes_system/note_service/internal/apperror"
 	"github.com/theartofdevel/notes_system/note_service/pkg/logging"
-	"io/ioutil"
 	"net/http"
 )
 
@@ -85,13 +84,13 @@ func (h *Handler) CreateNote(w http.ResponseWriter, r *http.Request) error {
 	w.Header().Set("Content-Type", "application/json")
 
 	h.Logger.Debug("decode create tag dto")
-	var crNote CreateNoteDTO
+	var dto CreateNoteDTO
 	defer r.Body.Close()
-	if err := json.NewDecoder(r.Body).Decode(&crNote); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&dto); err != nil {
 		return apperror.BadRequestError("invalid data")
 	}
 
-	noteUUID, err := h.NoteService.Create(r.Context(), crNote)
+	noteUUID, err := h.NoteService.Create(r.Context(), dto)
 	if err != nil {
 		return err
 	}
@@ -112,32 +111,16 @@ func (h *Handler) PartiallyUpdateNote(w http.ResponseWriter, r *http.Request) er
 		return apperror.BadRequestError("uuid query parameter is required and must be a comma separated integers")
 	}
 
-	h.Logger.Debug("read body bytes")
+	h.Logger.Debug("decode update tag dto")
+	var dto UpdateNoteDTO
 	defer r.Body.Close()
-	bodyBytes, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		return err
+	if err := json.NewDecoder(r.Body).Decode(&dto); err != nil {
+		return apperror.BadRequestError("invalid data")
 	}
 
-	h.Logger.Debug("unmarshal body bytes to update note dto")
-	var noteDTO UpdateNoteDTO
-	if err := json.Unmarshal(bodyBytes, &noteDTO); err != nil {
-		return err
-	}
-	tagsUpdate := len(noteDTO.Tags) != 0
-	if len(noteDTO.Tags) == 0 {
-		h.Logger.Debug("unmarshal body bytes to map")
-		var data map[string]interface{}
-		if err = json.Unmarshal(bodyBytes, &data); err != nil {
-			return err
-		}
-		h.Logger.Debug("check key tags in map")
-		if _, ok := data["tags"]; ok {
-			tagsUpdate = true
-		}
-	}
+	dto.UUID = noteUUID
 
-	err = h.NoteService.Update(r.Context(), noteUUID, noteDTO, tagsUpdate)
+	err := h.NoteService.Update(r.Context(), dto)
 	if err != nil {
 		return err
 	}

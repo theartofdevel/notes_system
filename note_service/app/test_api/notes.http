@@ -3,7 +3,7 @@ Accept: application/json
 
 ### Get note
 
-GET http://localhost:8081/api/notes/606b8674e29ab2fa0fe83eaa
+GET http://localhost:8081/api/notes/6083eab243fbb5781bfa82d0
 Accept: application/json
 
 ### Create note
@@ -19,11 +19,10 @@ Content-Type: application/json
 
 ### Update note
 
-PATCH http://localhost:8081/api/notes/60697ce2334819d734b2b5f5
+PATCH http://localhost:8081/api/notes/6083eab243fbb5781bfa82d0
 Content-Type: application/json
 
 {
-  "header": "note 2 changed again",
   "tags": []
 }
 

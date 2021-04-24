@@ -26,13 +26,14 @@ type Service interface {
 	Create(ctx context.Context, dto CreateNoteDTO) (string, error)
 	GetOne(ctx context.Context, uuid string) (Note, error)
 	GetByCategoryUUID(ctx context.Context, uuid string) ([]Note, error)
-	Update(ctx context.Context, uuid string, dto UpdateNoteDTO, tagsUpdate bool) error
+	Update(ctx context.Context, dto UpdateNoteDTO) error
 	Delete(ctx context.Context, uuid string) error
 }
 
 func (s service) Create(ctx context.Context, dto CreateNoteDTO) (noteUUID string, err error) {
-	dto.GenerateShortBody()
-	noteUUID, err = s.storage.Create(ctx, dto)
+	note := NewNote(dto)
+	note.GenerateShortBody()
+	noteUUID, err = s.storage.Create(ctx, note)
 
 	if err != nil {
 		if errors.Is(err, apperror.ErrNotFound) {
@@ -71,11 +72,12 @@ func (s service) GetByCategoryUUID(ctx context.Context, uuid string) (notes []No
 	return notes, nil
 }
 
-func (s service) Update(ctx context.Context, uuid string, dto UpdateNoteDTO, tagsUpdate bool) error {
-	if dto.Body == "" && dto.Header == "" && dto.CategoryUUID == "" && !tagsUpdate {
+func (s service) Update(ctx context.Context, dto UpdateNoteDTO) error {
+	if dto.Body == "" && dto.Header == "" && dto.CategoryUUID == "" && dto.Tags == nil {
 		return apperror.BadRequestError("nothing to update")
 	}
-	err := s.storage.Update(ctx, uuid, dto, tagsUpdate)
+	note := UpdatedNote(dto)
+	err := s.storage.Update(ctx, note)
 
 	if err != nil {
 		if errors.Is(err, apperror.ErrNotFound) {
