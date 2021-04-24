@@ -16,9 +16,9 @@ func NewClient(ctx context.Context, host, port, username, password, database, au
 		Password:    password,
 		PasswordSet: true,
 	}
-	reqCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	client, err := mongo.Connect(reqCtx, options.Client().ApplyURI(mongoDBURL).SetAuth(credentials))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoDBURL).SetAuth(credentials))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create client to mongodb due to error %w", err)
 	}
