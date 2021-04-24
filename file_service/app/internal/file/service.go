@@ -26,8 +26,8 @@ type Service interface {
 	Delete(ctx context.Context, noteUUID, fileName string) error
 }
 
-func (s *service) GetFile(ctx context.Context, noteUUID, fileName string) (f *File, err error) {
-	f, err = s.storage.GetFile(ctx, noteUUID, fileName)
+func (s *service) GetFile(ctx context.Context, noteUUID, fileId string) (f *File, err error) {
+	f, err = s.storage.GetFile(ctx, noteUUID, fileId)
 	if err != nil {
 		return f, err
 	}

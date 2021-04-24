@@ -11,7 +11,7 @@ import (
 
 const (
 	filesURL = "/api/files"
-	fileURL = "/api/files/:name"
+	fileURL = "/api/files/:id"
 )
 
 type Handler struct {
@@ -35,11 +35,11 @@ func (h *Handler) GetFile(w http.ResponseWriter, r *http.Request) error {
 		return apperror.BadRequestError("note_uuid query parameter is required")
 	}
 
-	h.Logger.Debug("get name from context")
+	h.Logger.Debug("get fileId from context")
 	params := r.Context().Value(httprouter.ParamsKey).(httprouter.Params)
-	name := params.ByName("name")
+	fileId := params.ByName("id")
 
-	f, err := h.FileService.GetFile(r.Context(), noteUUID, name)
+	f, err := h.FileService.GetFile(r.Context(), noteUUID, fileId)
 	if err != nil {
 		return err
 	}
