@@ -26,12 +26,14 @@ type Service interface {
 	Create(ctx context.Context, dto CreateTagDTO) (int, error)
 	GetOne(ctx context.Context, id int) (Tag, error)
 	GetMany(ctx context.Context, ids []int) ([]Tag, error)
-	Update(ctx context.Context, id int, dto UpdateTagDTO) error
+	Update(ctx context.Context, dto UpdateTagDTO) error
 	Delete(ctx context.Context, id int) error
 }
 
 func (s service) Create(ctx context.Context, dto CreateTagDTO) (tagID int, err error) {
-	tagID, err = s.storage.Create(ctx, dto)
+	tag := NewTag(dto)
+
+	tagID, err = s.storage.Create(ctx, tag)
 
 	if err != nil {
 		if errors.Is(err, apperror.ErrNotFound) {
@@ -71,12 +73,14 @@ func (s service) GetMany(ctx context.Context, ids []int) (tags []Tag, err error)
 	return tags, nil
 }
 
-func (s service) Update(ctx context.Context, id int, dto UpdateTagDTO) error {
+func (s service) Update(ctx context.Context, dto UpdateTagDTO) error {
 	if dto.Name == "" && dto.Color == "" {
 		return apperror.BadRequestError("no data to update")
 	}
 
-	err := s.storage.Update(ctx, id, dto)
+	tag := UpdatedTag(dto)
+
+	err := s.storage.Update(ctx, tag)
 
 	if err != nil {
 		if errors.Is(err, apperror.ErrNotFound) {

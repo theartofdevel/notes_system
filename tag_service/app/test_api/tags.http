@@ -7,18 +7,20 @@ POST http://localhost:8083/api/tags
 Content-Type: application/json
 
 {
-  "name": "tag 2",
+  "name": "tag 4",
   "color": "hex",
-  "user_uuid": "1"
+  "owner_id": "1"
 }
 
 ### Update tag
 
-PATCH http://localhost:8083/api/tags/3
+PATCH http://localhost:8083/api/tags/1
 Content-Type: application/json
 
 {
-  "name": "oops"
+  "name": "tag 111",
+  "color": "sss",
+  "owner_id": "1"
 }
 
 ### Delete tag

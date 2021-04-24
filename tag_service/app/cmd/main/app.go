@@ -10,6 +10,7 @@ import (
 	"github.com/theartofdevel/notes_system/tag_service/internal/tag/db"
 	"github.com/theartofdevel/notes_system/tag_service/pkg/handlers/metric"
 	"github.com/theartofdevel/notes_system/tag_service/pkg/logging"
+	mongo "github.com/theartofdevel/notes_system/tag_service/pkg/mongodb"
 	"github.com/theartofdevel/notes_system/tag_service/pkg/shutdown"
 	"net"
 	"net/http"
@@ -34,8 +35,12 @@ func main() {
 	metricHandler := metric.Handler{Logger: logger}
 	metricHandler.Register(router)
 
-	tagStorage, err := db.NewStorage(context.Background(), cfg.MongoDB.Host, cfg.MongoDB.Port,
-		cfg.MongoDB.Username, cfg.MongoDB.Password, cfg.MongoDB.AuthDB, cfg.MongoDB.Database, cfg.MongoDB.Collection, logger)
+	mongoClient, err := mongo.NewClient(context.Background(), cfg.MongoDB.Host, cfg.MongoDB.Port,
+		cfg.MongoDB.Username, cfg.MongoDB.Password, cfg.MongoDB.Database, cfg.MongoDB.AuthDB)
+	if err != nil {
+		logger.Fatal(err)
+	}
+	tagStorage := db.NewStorage(mongoClient, cfg.MongoDB.Collection, logger)
 	if err != nil {
 		panic(err)
 	}

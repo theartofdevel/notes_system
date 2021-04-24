@@ -17,49 +17,21 @@ var _ tag.Storage = &db{}
 
 type db struct {
 	collection *mongo.Collection
-	client     *mongo.Client
 	logger     logging.Logger
 }
 
-func NewStorage(ctx context.Context, hostname, port, username, password, authSource, database, entity string, logger logging.Logger) (tag.Storage, error) {
-	mongoDBURL := fmt.Sprintf("mongodb://%s:%s@%s:%s", username, password, hostname, port)
-	credentials := options.Credential{
-		AuthSource:  authSource,
-		Username:    username,
-		Password:    password,
-		PasswordSet: true,
-	}
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoDBURL).SetAuth(credentials))
-	if err != nil {
-		return nil, fmt.Errorf("failed to create client to mongodb due to error %w", err)
-	}
-
-	collection := client.Database(database).Collection(entity)
-
-	s := db{
-		client:     client,
-		collection: collection,
+func NewStorage(storage *mongo.Database, collection string, logger logging.Logger) tag.Storage {
+	return &db{
+		collection: storage.Collection(collection),
 		logger:     logger,
 	}
-
-	err = s.isConnected(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to connect to mongodb due to error %w", err)
-	}
-	return &s, nil
 }
-
-func (s *db) Create(ctx context.Context, dto tag.CreateTagDTO) (id int, err error) {
-	err = s.isConnected(ctx)
-	if err != nil {
-		return id, fmt.Errorf("storage is not connected. error: %w", err)
-	}
-
+func (s *db) Create(ctx context.Context, t tag.Tag) (id int, err error) {
 	nCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
 	findOptions := options.FindOptions{}
-	findOptions.SetSort(bson.D{{"_id", -1}}) //nolint:govet
+	findOptions.SetSort(bson.D{{"_id", -1}})
 	findOptions.SetLimit(1)
 	var nTag tag.Tag
 	cursor, err := s.collection.Find(nCtx, bson.M{}, &findOptions)
@@ -82,10 +54,10 @@ func (s *db) Create(ctx context.Context, dto tag.CreateTagDTO) (id int, err erro
 
 		tryCount--
 
-		dto.ID = nTagID
+		t.ID = nTagID
 		nCtx, cancel = context.WithTimeout(ctx, 5*time.Second)
 		defer cancel()
-		_, err = s.collection.InsertOne(nCtx, dto)
+		_, err = s.collection.InsertOne(nCtx, t)
 		if err != nil {
 			if mongo.IsDuplicateKeyError(err) {
 				s.logger.Warnf("duplicate key error. continue optimistic loop")
@@ -101,11 +73,6 @@ func (s *db) Create(ctx context.Context, dto tag.CreateTagDTO) (id int, err erro
 }
 
 func (s *db) FindOne(ctx context.Context, id int) (t tag.Tag, err error) {
-	err = s.isConnected(ctx)
-	if err != nil {
-		return t, fmt.Errorf("storage is not connected. error: %w", err)
-	}
-
 	filter := bson.M{"_id": id}
 
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
@@ -127,11 +94,6 @@ func (s *db) FindOne(ctx context.Context, id int) (t tag.Tag, err error) {
 }
 
 func (s *db) FindMany(ctx context.Context, ids []int) (tags []tag.Tag, err error) {
-	err = s.isConnected(ctx)
-	if err != nil {
-		return tags, fmt.Errorf("storage is not connected. error: %w", err)
-	}
-
 	filter := bson.M{"_id": bson.M{"$in": ids}}
 
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
@@ -150,15 +112,10 @@ func (s *db) FindMany(ctx context.Context, ids []int) (tags []tag.Tag, err error
 	return tags, fmt.Errorf("failed to decode document. error: %w", err)
 }
 
-func (s *db) Update(ctx context.Context, id int, dto tag.UpdateTagDTO) error {
-	err := s.isConnected(ctx)
-	if err != nil {
-		return fmt.Errorf("storage is not connected. error: %w", err)
-	}
+func (s *db) Update(ctx context.Context, t tag.Tag) error {
+	filter := bson.M{"_id": t.ID}
 
-	filter := bson.M{"_id": id}
-
-	tagByte, err := bson.Marshal(dto)
+	tagByte, err := bson.Marshal(t)
 	if err != nil {
 		return fmt.Errorf("failed to marshal document. error: %w", err)
 	}
@@ -168,6 +125,8 @@ func (s *db) Update(ctx context.Context, id int, dto tag.UpdateTagDTO) error {
 	if err != nil {
 		return fmt.Errorf("failed to unmarshal document. error: %w", err)
 	}
+
+	delete(updateObj, "_id")
 
 	update := bson.M{
 		"$set": updateObj,
@@ -189,11 +148,6 @@ func (s *db) Update(ctx context.Context, id int, dto tag.UpdateTagDTO) error {
 }
 
 func (s *db) Delete(ctx context.Context, id int) error {
-	err := s.isConnected(ctx)
-	if err != nil {
-		return fmt.Errorf("storage is not connected. error: %w", err)
-	}
-
 	filter := bson.M{"_id": id}
 
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
@@ -209,22 +163,4 @@ func (s *db) Delete(ctx context.Context, id int) error {
 	s.logger.Tracef("Delete %v documents.\n", result.DeletedCount)
 
 	return nil
-}
-
-func (s *db) isConnected(ctx context.Context) error {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-	return s.client.Ping(ctx, nil)
-}
-
-func (s *db) Close(ctx context.Context) error {
-	var err error
-	if err = s.isConnected(ctx); err != nil {
-		ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-		defer cancel()
-		err = s.client.Disconnect(ctx)
-	}
-	s.collection = nil
-	s.client = nil
-	return err
 }

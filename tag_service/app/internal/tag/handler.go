@@ -101,13 +101,13 @@ func (h *Handler) CreateTag(w http.ResponseWriter, r *http.Request) error {
 	w.Header().Set("Content-Type", "application/json")
 
 	h.Logger.Debug("decode create tag dto")
-	var crTag CreateTagDTO
+	var dto CreateTagDTO
 	defer r.Body.Close()
-	if err := json.NewDecoder(r.Body).Decode(&crTag); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&dto); err != nil {
 		return apperror.BadRequestError("invalid JSON scheme")
 	}
 
-	tagID, err := h.TagService.Create(r.Context(), crTag)
+	tagID, err := h.TagService.Create(r.Context(), dto)
 	if err != nil {
 		return err
 	}
@@ -133,16 +133,19 @@ func (h *Handler) PartiallyUpdateTag(w http.ResponseWriter, r *http.Request) err
 	}
 
 	h.Logger.Debug("decode update tag dto")
-	var tagDTO UpdateTagDTO
+	var dto UpdateTagDTO
 	defer r.Body.Close()
-	if err := json.NewDecoder(r.Body).Decode(&tagDTO); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&dto); err != nil {
 		return apperror.BadRequestError("invalid JSON scheme")
 	}
 
-	err = h.TagService.Update(r.Context(), tagID, tagDTO)
+	dto.ID = tagID
+
+	err = h.TagService.Update(r.Context(), dto)
 	if err != nil {
 		return err
 	}
+
 	w.WriteHeader(http.StatusNoContent)
 
 	return nil
