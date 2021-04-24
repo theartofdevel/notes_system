@@ -10,6 +10,7 @@ import (
 	"github.com/theartofdevel/notes_system/user_service/internal/user/db"
 	"github.com/theartofdevel/notes_system/user_service/pkg/logging"
 	"github.com/theartofdevel/notes_system/user_service/pkg/metric"
+	mongo "github.com/theartofdevel/notes_system/user_service/pkg/mongodb"
 	"github.com/theartofdevel/notes_system/user_service/pkg/shutdown"
 	"net"
 	"net/http"
@@ -34,14 +35,15 @@ func main() {
 	metricHandler := metric.Handler{Logger: logger}
 	metricHandler.Register(router)
 
-	userStorage, err := db.NewStorage(context.Background(), cfg.MongoDB.Host, cfg.MongoDB.Port,
-		cfg.MongoDB.Username, cfg.MongoDB.Password, cfg.MongoDB.AuthDB, cfg.MongoDB.Database, cfg.MongoDB.Collection, logger)
+	mongoClient, err := mongo.NewClient(context.Background(), cfg.MongoDB.Host, cfg.MongoDB.Port,
+		cfg.MongoDB.Username, cfg.MongoDB.Password, cfg.MongoDB.Database, cfg.MongoDB.AuthDB)
 	if err != nil {
-		panic(err)
+		logger.Fatal(err)
 	}
+	userStorage := db.NewStorage(mongoClient, cfg.MongoDB.Collection, logger)
 	userService, err := user.NewService(userStorage, logger)
 	if err != nil {
-		panic(err)
+		logger.Fatal(err)
 	}
 
 	usersHandler := user.Handler{

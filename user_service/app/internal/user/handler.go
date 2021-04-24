@@ -113,8 +113,9 @@ func (h *Handler) PartiallyUpdateUser(w http.ResponseWriter, r *http.Request) er
 	if err := json.NewDecoder(r.Body).Decode(&updUser); err != nil {
 		return apperror.BadRequestError("invalid JSON scheme. check swagger API")
 	}
+	updUser.UUID = userUUID
 
-	err := h.UserService.Update(r.Context(), userUUID, updUser)
+	err := h.UserService.Update(r.Context(), updUser)
 	if err != nil {
 		return err
 	}

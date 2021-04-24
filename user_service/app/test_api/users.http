@@ -1,6 +1,6 @@
 # Get user
 
-GET http://localhost:8082/api/users?email=858683@gmail.com&password=123456
+GET http://localhost:8082/api/users?email=858683@gmail.com&password=1234
 Accept: application/json
 
 ### Create user
@@ -16,16 +16,15 @@ Content-Type: application/json
 
 ### Update user
 
-PATCH http://localhost:8082/api/users/60696063d630d91586d2ed85
+PATCH http://localhost:8082/api/users/6083e6f2c238914ea1862f70
 Content-Type: application/json
 
 {
-  "email": "858683@gmail.com",
-  "old_password": "1234567",
-  "new_password": "12345678"
+  "old_password": "123",
+  "new_password": "1234"
 }
 
 ### Delete user
 
-DELETE http://localhost:8082/api/users/60696063d630d91586d2ed85
+DELETE http://localhost:8082/api/users/6083e6f2c238914ea1862f70
 Content-Type: application/json

@@ -27,7 +27,7 @@ type Service interface {
 	Create(ctx context.Context, dto CreateUserDTO) (string, error)
 	GetByEmailAndPassword(ctx context.Context, email, password string) (User, error)
 	GetOne(ctx context.Context, uuid string) (User, error)
-	Update(ctx context.Context, uuid string, dto UpdateUserDTO) error
+	Update(ctx context.Context, dto UpdateUserDTO) error
 	Delete(ctx context.Context, uuid string) error
 }
 
@@ -37,14 +37,16 @@ func (s service) Create(ctx context.Context, dto CreateUserDTO) (userUUID string
 		return userUUID, apperror.BadRequestError("password does not match repeat password")
 	}
 
+	user := NewUser(dto)
+
 	s.logger.Debug("generate password hash")
-	err = dto.GeneratePasswordHash()
+	err = user.GeneratePasswordHash()
 	if err != nil {
 		s.logger.Errorf("failed to create user due to error %v", err)
 		return
 	}
 
-	userUUID, err = s.storage.Create(ctx, dto)
+	userUUID, err = s.storage.Create(ctx, user)
 
 	if err != nil {
 		if errors.Is(err, apperror.ErrNotFound) {
@@ -85,11 +87,12 @@ func (s service) GetOne(ctx context.Context, uuid string) (u User, err error) {
 	return u, nil
 }
 
-func (s service) Update(ctx context.Context, uuid string, dto UpdateUserDTO) error {
+func (s service) Update(ctx context.Context, dto UpdateUserDTO) error {
+	var updatedUser User
 	s.logger.Debug("compare old and new passwords")
 	if dto.OldPassword != dto.NewPassword || dto.NewPassword == "" {
 		s.logger.Debug("get user by uuid")
-		user, err := s.GetOne(ctx, uuid)
+		user, err := s.GetOne(ctx, dto.UUID)
 		if err != nil {
 			return err
 		}
@@ -100,14 +103,18 @@ func (s service) Update(ctx context.Context, uuid string, dto UpdateUserDTO) err
 			return apperror.BadRequestError("old password does not match current password")
 		}
 
-		s.logger.Debug("generate password hash")
-		err = dto.GeneratePasswordHash()
-		if err != nil {
-			return fmt.Errorf("failed to update user. error %w", err)
-		}
+		dto.Password = dto.NewPassword
 	}
 
-	err := s.storage.Update(ctx, uuid, dto)
+	updatedUser = UpdatedUser(dto)
+
+	s.logger.Debug("generate password hash")
+	err := updatedUser.GeneratePasswordHash()
+	if err != nil {
+		return fmt.Errorf("failed to update user. error %w", err)
+	}
+
+	err = s.storage.Update(ctx, updatedUser)
 
 	if err != nil {
 		if errors.Is(err, apperror.ErrNotFound) {
