@@ -82,9 +82,10 @@ func (h *Handler) CreateFile(w http.ResponseWriter, r *http.Request) error {
 	h.Logger.Info("CREATE FILE")
 	w.Header().Set("Content-Type", "form/json")
 
+	// TODO maximum file size
 	err := r.ParseMultipartForm(32 << 20)
 	if err != nil {
-		h.Logger.Error(err)
+		return err
 	}
 
 	h.Logger.Debug("decode create upload fileInfo dto")
@@ -114,16 +115,16 @@ func (h *Handler) DeleteFile(w http.ResponseWriter, r *http.Request) error {
 	h.Logger.Info("DELETE FILE")
 	w.Header().Set("Content-Type", "application/json")
 
-	h.Logger.Debug("get name from context")
+	h.Logger.Debug("get fileId from context")
 	params := r.Context().Value(httprouter.ParamsKey).(httprouter.Params)
-	name := params.ByName("name")
+	fileId := params.ByName("id")
 
 	noteUUID := r.URL.Query().Get("note_uuid")
 	if noteUUID == "" {
 		return apperror.BadRequestError("note_uuid query parameter is required")
 	}
 
-	err := h.FileService.Delete(r.Context(), noteUUID, name)
+	err := h.FileService.Delete(r.Context(), noteUUID, fileId)
 	if err != nil {
 		return err
 	}

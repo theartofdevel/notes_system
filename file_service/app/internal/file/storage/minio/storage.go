@@ -31,6 +31,7 @@ func (m *minioStorage) GetFile(ctx context.Context, bucketName, fileID string) (
 	if err != nil {
 		return nil, fmt.Errorf("failed to get file. err: %w", err)
 	}
+	defer obj.Close()
 	objectInfo, err := obj.Stat()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get file. err: %w", err)
@@ -78,6 +79,7 @@ func (m *minioStorage) GetFilesByNoteUUID(ctx context.Context, noteUUID string) 
 			Bytes: buffer,
 		}
 		files = append(files, &f)
+		obj.Close()
 	}
 
 	return files, nil

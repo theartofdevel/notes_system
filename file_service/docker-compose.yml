@@ -1,8 +1,5 @@
 version: '3.7'
 
-# starts 4 docker containers running minio server instances.
-# using nginx reverse proxy, load balancing, you can access
-# it through port 9000.
 services:
   minio1:
     image: minio/minio:RELEASE.2021-04-06T23-11-00Z
@@ -48,8 +45,6 @@ services:
       - minio1
       - minio2
 
-## By default this config uses default local driver,
-## For custom volumes replace with volume driver configuration.
 volumes:
   data1-1:
   data1-2:
