@@ -18,7 +18,8 @@ jobs:
         go-version: 1.15
 
     - name: Build
-      run: go build -v ./api_service/app/cmd/main
+      run: go build -v ./api_service/app/
 
     - name: Test
-      run: go test -v ./api_service/app/cmd/main
+      run: go test -v ./api_service/app/
+
