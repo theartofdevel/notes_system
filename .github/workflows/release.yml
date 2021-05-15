@@ -1,0 +1,18 @@
+name: Build Golang App
+on: release
+jobs:
+  api_service:
+    name: APIService release linux/386
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: compile and release
+      uses: ngs/go-release.action@v1.0.1
+      with:
+        project_path: "api_service/app"
+        binary_name: api_service
+        overwrite: true
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        goarch: "386"
+        goos: linux
+        extra_files: "LICENSE"
