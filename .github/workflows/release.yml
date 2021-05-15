@@ -1,5 +1,9 @@
-name: Build Golang App
-on: release
+name: Build Golang Services
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 jobs:
   api_service:
     name: APIService release linux/386
