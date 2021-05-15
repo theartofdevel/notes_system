@@ -18,8 +18,8 @@ jobs:
         go-version: 1.15
 
     - name: Build
-      run: go build -v ./api_service/app/cmd/main
+      run: cd ./api_service/app/ && go build -v -i -o ./build/api_service ./cmd/main/app.go
 
     - name: Test
-      run: go test -v ./api_service/app/cmd/main
+      run: cd ./api_service/app/ && go test -v ./cmd/main
 
