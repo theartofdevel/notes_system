@@ -44,6 +44,8 @@ jobs:
               echo "::set-output name=tag_service::true"
             if [[ $file != user_service/* ]]; then
               echo "::set-output name=user_service::true"
+            else
+              echo "file does not belong to any service"
             fi
           done < files.txt
   api_service:
