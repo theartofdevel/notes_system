@@ -8,6 +8,8 @@ listen:
 mongodb:
   host: localhost
   port: 27017
+  username: testadm
+  password: testadm
   auth_db: admin
   database: notes_system
   collection: notes
