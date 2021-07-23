@@ -16,8 +16,8 @@ type Config struct {
 	MongoDB struct {
 		Host       string `yaml:"host" env-required:"true"`
 		Port       string `yaml:"port" env-required:"true"`
-		Username   string `yaml:"username" env-required:"true"`
-		Password   string `yaml:"password" env-required:"true"`
+		Username   string `yaml:"username"`
+		Password   string `yaml:"password"`
 		AuthDB     string `yaml:"auth_db" env-required:"true"`
 		Database   string `yaml:"database" env-required:"true"`
 		Collection string `yaml:"collection" env-required:"true"`
