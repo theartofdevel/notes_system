@@ -24,30 +24,30 @@ jobs:
       - name: check modified files
         id: check_files
         run: |
-          echo "=============== list modified files ==============="
-          git diff --name-only HEAD^ HEAD
-          
-          echo "========== check paths of modified files =========="
-          git diff --name-only HEAD^ HEAD > files.txt
-          while IFS= read -r file
-          do
-            echo $file
-            if [[ $file != api_service/* ]]; then
-              echo "::set-output name=api_service::true"
-            if [[ $file != notes_service/* ]]; then
-              echo "::set-output name=notes_service::true"
-            if [[ $file != category_service/* ]]; then
-              echo "::set-output name=category_service::true"
-            if [[ $file != file_service/* ]]; then
-              echo "::set-output name=file_service::true"
-            if [[ $file != tag_service/* ]]; then
-              echo "::set-output name=tag_service::true"
-            if [[ $file != user_service/* ]]; then
-              echo "::set-output name=user_service::true"
-            else
-              echo "file does not belong to any service"
-            fi
-          done < files.txt
+            echo "=============== list modified files ==============="
+            git diff --name-only HEAD^ HEAD
+
+            echo "========== check paths of modified files =========="
+            git diff --name-only HEAD^ HEAD > files.txt
+            while IFS= read -r file; do
+              echo $file
+              if [[ $file == api_service/* ]]; then
+                echo "::set-output name=api_service::true"
+              elif [[ $file == notes_service/* ]]; then
+                echo "::set-output name=notes_service::true"
+              elif [[ $file == category_service/* ]]; then
+                echo "::set-output name=category_service::true"
+              elif [[ $file == file_service/* ]]; then
+                echo "::set-output name=file_service::true"
+              elif [[ $file == tag_service/* ]]; then
+                echo "::set-output name=tag_service::true"
+              elif [[ $file == user_service/* ]]; then
+                echo "::set-output name=user_service::true"
+              else
+                echo "file does not belong to any service"
+              fi
+            done < files.txt
+
   api_service:
     needs: check
     if: needs.check.outputs.api_service == 'true'
