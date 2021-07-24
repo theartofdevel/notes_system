@@ -4,8 +4,8 @@
 
 # config.yml
 
-## GitHub Actions
-
 ## Manual Deploy
+
+### git
 
 ## Contributing
