@@ -2,6 +2,8 @@
 
 ## Configuration
 
+# config.yml
+
 ## GitHub Actions
 
 ## Manual Deploy
