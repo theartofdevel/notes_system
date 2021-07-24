@@ -10,4 +10,3 @@
 
 ## Contributing
 
-### more
