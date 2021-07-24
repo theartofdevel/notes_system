@@ -58,8 +58,9 @@ jobs:
       run: docker build api_service/ --tag notes_system.api_service:1.0
 
     - name: Publish to Registry
-      uses: elgohr/Publish-Docker-Github-Action@master
+      uses: docker/build-push-action@v1
       with:
-        name: forbsey/go-github-actions
+        dockerfile: api_service/Dockerfile
+        repository: theartofdevel/notes_system.api_service
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
