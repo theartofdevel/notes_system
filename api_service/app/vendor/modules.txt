@@ -1,0 +1,41 @@
+# github.com/BurntSushi/toml v0.3.1
+github.com/BurntSushi/toml
+# github.com/cespare/xxhash v1.1.0
+github.com/cespare/xxhash
+# github.com/coocood/freecache v1.1.1
+## explicit
+github.com/coocood/freecache
+# github.com/cristalhq/jwt/v3 v3.0.12
+## explicit
+github.com/cristalhq/jwt/v3
+# github.com/davecgh/go-spew v1.1.1
+github.com/davecgh/go-spew/spew
+# github.com/fatih/structs v1.1.0
+## explicit
+github.com/fatih/structs
+# github.com/google/uuid v1.2.0
+## explicit
+github.com/google/uuid
+# github.com/ilyakaznacheev/cleanenv v1.2.5
+## explicit
+github.com/ilyakaznacheev/cleanenv
+# github.com/joho/godotenv v1.3.0
+github.com/joho/godotenv
+# github.com/julienschmidt/httprouter v1.3.0
+## explicit
+github.com/julienschmidt/httprouter
+# github.com/pmezard/go-difflib v1.0.0
+github.com/pmezard/go-difflib/difflib
+# github.com/sirupsen/logrus v1.8.1
+## explicit
+github.com/sirupsen/logrus
+# github.com/stretchr/testify v1.2.2
+## explicit
+github.com/stretchr/testify/assert
+# golang.org/x/sys v0.0.0-20191026070338-33540a1f6037
+golang.org/x/sys/unix
+golang.org/x/sys/windows
+# gopkg.in/yaml.v2 v2.2.2
+gopkg.in/yaml.v2
+# olympos.io/encoding/edn v0.0.0-20200308123125-93e3b8dd0e24
+olympos.io/encoding/edn
