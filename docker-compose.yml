@@ -7,7 +7,7 @@ services:
     networks:
       - notes_net
     ports:
-      - 8080:8080
+      - 10000:10000
 networks:
   notes_net:
     driver: bridge

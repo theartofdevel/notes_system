@@ -6,7 +6,7 @@ jwt:
 listen:
   type: port
   bind_ip: localhost
-  port: 8080
+  port: 10000
 category_service:
   url: http://127.0.0.1:5000/api
 note_service:
