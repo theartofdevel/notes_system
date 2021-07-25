@@ -6,7 +6,5 @@
 
 ## Manual Deploy
 
-### git
-
 ## Contributing
 
