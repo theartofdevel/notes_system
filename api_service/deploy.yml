@@ -8,5 +8,5 @@
     - name: "Pull APIService image"
       shell: docker-compose -f /opt/docker/notes_system/docker-compose.yml pull api_service
 
-    - name: "Pull APIService image"
-      shell: docker-compose -f /opt/docker/notes_system/docker-compose.yml pull api_service
+    - name: "Start APIService"
+      shell: docker-compose -f /opt/docker/notes_system/docker-compose.yml start api_service
