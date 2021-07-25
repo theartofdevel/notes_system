@@ -67,3 +67,15 @@ jobs:
         context: api_service/
         push: true
         tags: theartofdevel/notes_system.api_service:latest
+
+    - name: Update on Server
+      uses: dawidd6/action-ansible-playbook@v2
+      with:
+        playbook: api_service/deploy.yml
+        directory: api_service/
+        key: ${{secrets.KART_SSH_PRIV_KEY}}
+        inventory: |
+          [all]
+          kartservices.com ansible_ssh_port=1111 ansible_ssh_user=karapetov
+        options: |
+          --verbose

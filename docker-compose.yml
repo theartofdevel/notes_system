@@ -1,0 +1,13 @@
+version: '2'
+services:
+  api_service:
+    restart: always
+    image: theartofdevel/notes_system.api_service:latest
+    container_name: api_service
+    networks:
+      - notes_net
+    ports:
+      - 8080:8080
+networks:
+  notes_net:
+    driver: bridge

@@ -1,0 +1,12 @@
+---
+- hosts: all
+  gather_facts: false
+  tasks:
+    - name: "Stop APIService container"
+      shell: docker-compose -f /opt/docker/notes_system/docker-compose.yml stop api_service
+
+    - name: "Pull APIService image"
+      shell: docker-compose -f /opt/docker/notes_system/docker-compose.yml pull api_service
+
+    - name: "Pull APIService image"
+      shell: docker-compose -f /opt/docker/notes_system/docker-compose.yml pull api_service
