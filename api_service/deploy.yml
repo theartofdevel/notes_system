@@ -12,10 +12,11 @@
         group: "noteadmin"
         mode: 0775
       become: yes
+      become_method: sudo
 
     - name: "copy docker-compose.yml"
       copy:
-        src: "api_service/docker-compose.yml"
+        src: "./docker-compose.yml"
         dest: "{{ app_path }}/docker-compose.yml"
         owner: "noteadmin"
         group: "noteadmin"
