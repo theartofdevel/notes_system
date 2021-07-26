@@ -16,7 +16,7 @@
 
     - name: "copy docker-compose.yml"
       copy:
-        src: "docker-compose.yml"
+        src: "{{ local_pwd }}/docker-compose.yml"
         dest: "{{ app_path }}/docker-compose.yml"
         owner: "noteadmin"
         group: "noteadmin"
