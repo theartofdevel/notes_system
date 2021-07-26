@@ -14,25 +14,15 @@
       become: yes
       become_method: sudo
 
-    - name: pwd
-      command: pwd
-      register: pwwd
-      delegate_to: 127.0.0.1
-    - debug: msg="{{ pwwd.stdout }}"
-
-    - name: ls -la
-      command: ls -la
-      register: liist
-      delegate_to: 127.0.0.1
-    - debug: msg="{{ liist.stdout }}"
-
     - name: "copy docker-compose.yml"
       copy:
         src: "docker-compose.yml"
         dest: "{{ app_path }}/docker-compose.yml"
         owner: "noteadmin"
         group: "noteadmin"
-        mode: "0644"
+        mode: 0644
+        become: yes
+        become_method: sudo
 
     - name: "stop services"
       shell: docker-compose -f {{ app_path }}/docker-compose.yml stop
