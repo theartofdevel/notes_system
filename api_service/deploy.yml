@@ -21,8 +21,8 @@
         owner: "noteadmin"
         group: "noteadmin"
         mode: 0644
-        become: yes
-        become_method: sudo
+      become: yes
+      become_method: sudo
 
     - name: "stop services"
       shell: docker-compose -f {{ app_path }}/docker-compose.yml stop
