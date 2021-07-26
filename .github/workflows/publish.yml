@@ -78,5 +78,5 @@ jobs:
           [all]
           kartservices.com ansible_ssh_port=${{secrets.KART_SSH_PORT}} ansible_ssh_user=${{secrets.KART_SSH_USER}} ansible_become_user=${{secrets.KART_ANSIBLE_BECOME_USER}} ansible_become_password=${{secrets.KART_ANSIBLE_BECOME_PASSWORD}}
         options: |
-          --extra-vars local_pwd=${{GITHUB_WORKSPACE}}
+          --extra-vars local_pwd=${{env.GITHUB_WORKSPACE}}
           --verbose
