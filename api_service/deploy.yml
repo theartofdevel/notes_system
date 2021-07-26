@@ -17,16 +17,18 @@
     - name: pwd
       command: pwd
       register: pwwd
+      delegate_to: 127.0.0.1
     - debug: msg="{{ pwwd.stdout }}"
 
     - name: ls -la
       command: ls -la
       register: liist
+      delegate_to: 127.0.0.1
     - debug: msg="{{ liist.stdout }}"
 
     - name: "copy docker-compose.yml"
       copy:
-        src: "docker-compose.yml"
+        src: "api_service/docker-compose.yml"
         dest: "{{ app_path }}/docker-compose.yml"
         owner: "noteadmin"
         group: "noteadmin"
