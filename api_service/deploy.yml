@@ -1,8 +1,8 @@
 ---
 - hosts: all
-  gather_facts: false
+  gather_facts: true
   vars:
-    app_path: /opt/docker/notes_system/api_service
+    app_path: /opt/notes_system/api_service
   tasks:
     - name: "create {{ app_path }}/"
       file:
