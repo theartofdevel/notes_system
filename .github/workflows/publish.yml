@@ -48,23 +48,6 @@ jobs:
   #             fi
   #           done < files.txt
 
-  system:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Deploy System
-      uses: dawidd6/action-ansible-playbook@v2
-      with:
-        playbook: deploy.yml
-        directory: ./
-        key: ${{secrets.KART_SSH_PRIV_KEY}}
-        inventory: |
-          [all]
-          kartservices.com ansible_ssh_port=1111 ansible_ssh_user=karapetov
-        options: |
-          --verbose
-
   api_service:
     # needs: check
     # if: needs.check.outputs.api_service == 'true'
@@ -93,6 +76,6 @@ jobs:
         key: ${{secrets.KART_SSH_PRIV_KEY}}
         inventory: |
           [all]
-          kartservices.com ansible_ssh_port=1111 ansible_ssh_user=karapetov
+          kartservices.com ansible_ssh_port=${{secrets.KART_SSH_PORT}} ansible_ssh_user=${{secrets.KART_SSH_USER}} ansible_become_user=${{secrets.KART_ANSIBLE_BECOME_USER}} ansible_become_password=${{secrets.KART_ANSIBLE_BECOME_PASSWORD}}
         options: |
           --verbose

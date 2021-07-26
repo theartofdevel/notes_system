@@ -1,12 +1,31 @@
 ---
 - hosts: all
   gather_facts: false
+  vars:
+    app_path: /opt/docker/notes_system/api_service
   tasks:
-    - name: "Stop APIService container"
-      shell: docker-compose -f /opt/docker/notes_system/docker-compose.yml stop api_service
+    - name: "create {{ app_path }}/"
+      file:
+        path: "{{ app_path }}/"
+        state: "directory"
+        owner: "karapetov"
+        group: "karapetov"
+        mode: 0775
+      become: yes
+    
+    - name: "copy docker-compose.yml"
+      copy:
+        src: "docker-compose.yml"
+        dest: "{{ app_path }}/docker-compose.yml"
+        owner: "karapetov"
+        group: "karapetov"
+        mode: "0644"
 
-    - name: "Pull APIService image"
-      shell: docker-compose -f /opt/docker/notes_system/docker-compose.yml pull api_service
+    - name: "stop services"
+      shell: docker-compose -f {{ app_path }}/docker-compose.yml stop
 
-    - name: "Start APIService"
-      shell: docker-compose -f /opt/docker/notes_system/docker-compose.yml up -d
+    - name: "pull images"
+      shell: docker-compose -f {{ app_path }}/docker-compose.yml pull
+
+    - name: "start services"
+      shell: docker-compose -f {{ app_path }}/docker-compose.yml up -d
