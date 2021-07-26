@@ -57,14 +57,14 @@ jobs:
       uses: dawidd6/action-ansible-playbook@v2
       with:
         playbook: deploy.yml
-        directory: api_service/
+        directory: ./
         key: ${{secrets.KART_SSH_PRIV_KEY}}
         inventory: |
           [all]
           kartservices.com ansible_ssh_port=1111 ansible_ssh_user=karapetov
         options: |
           --verbose
-          
+
   api_service:
     # needs: check
     # if: needs.check.outputs.api_service == 'true'
