@@ -8,17 +8,17 @@
       file:
         path: "{{ app_path }}/"
         state: "directory"
-        owner: "karapetov"
-        group: "karapetov"
+        owner: "noteadmin"
+        group: "noteadmin"
         mode: 0775
       become: yes
-    
+
     - name: "copy docker-compose.yml"
       copy:
-        src: "docker-compose.yml"
+        src: "api_service/docker-compose.yml"
         dest: "{{ app_path }}/docker-compose.yml"
-        owner: "karapetov"
-        group: "karapetov"
+        owner: "noteadmin"
+        group: "noteadmin"
         mode: "0644"
 
     - name: "stop services"
