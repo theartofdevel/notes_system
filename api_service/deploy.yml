@@ -14,6 +14,16 @@
       become: yes
       become_method: sudo
 
+    - name: pwd
+      command: pwd
+      register: pwwd
+    - debug: msg="{{ pwwd.stdout }}"
+
+    - name: ls -la
+      command: ls -la
+      register: liist
+    - debug: msg="{{ liist.stdout }}"
+
     - name: "copy docker-compose.yml"
       copy:
         src: "docker-compose.yml"
