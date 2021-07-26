@@ -1,0 +1,29 @@
+---
+version: '2'
+services:
+  neo4j:
+    restart: always
+    image: neo4j:4.2.3
+    container_name: neo4j
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:  
+      - ./export/neo4j/data:/data
+      - ./export/neo4j/var/lib/neo4j/conf:/var/lib/neo4j/conf
+      - ./export/neo4j/logs:/logs
+      - ./export/neo4j/var/lib/neo4j/import:/var/lib/neo4j/import
+      - ./export/neo4j/plugins:/plugins
+    environment:
+      - NEO4J_AUTH=neo4j/test
+  api_service:
+    restart: always
+    image: theartofdevel/notes_system.api_service:latest
+    container_name: api_service
+    networks:
+      - notes_net
+    ports:
+      - 10000:10000
+networks:
+  notes_net:
+    driver: bridge
