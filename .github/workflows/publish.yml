@@ -53,7 +53,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Update on Server
+    - name: Deploy System
       uses: dawidd6/action-ansible-playbook@v2
       with:
         playbook: deploy.yml
@@ -85,11 +85,11 @@ jobs:
         push: true
         tags: theartofdevel/notes_system.api_service:latest
 
-    - name: Upload docker-compose.yml
+    - name: Deploy APIService
       uses: dawidd6/action-ansible-playbook@v2
       with:
         playbook: deploy.yml
-        directory: ./
+        directory: api_service/
         key: ${{secrets.KART_SSH_PRIV_KEY}}
         inventory: |
           [all]
