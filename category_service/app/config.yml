@@ -1,7 +1,7 @@
 ---
 
 debug: true
-neo4j_hostname: taod
+neo4j_hostname: notes_system_neo4j
 neo4j_port: 7687
 neo4j_login: neo4j
 neo4j_password: test

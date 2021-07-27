@@ -4,7 +4,7 @@ services:
   neo4j:
     restart: always
     image: neo4j:4.2.3
-    container_name: neo4j
+    container_name: notes_system_neo4j
     ports:
       - "7474:7474"
       - "7687:7687"
@@ -16,3 +16,9 @@ services:
       - ./export/neo4j/plugins:/plugins
     environment:
       - NEO4J_AUTH=neo4j/test
+  category_service:
+    restart: always
+    image: theartofdevel/notes_system.category_service:latest
+    container_name: category_service
+    ports:
+      - 10001:10001

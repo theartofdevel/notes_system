@@ -79,3 +79,34 @@ jobs:
           kartservices.com ansible_ssh_port=${{secrets.KART_SSH_PORT}} ansible_ssh_user=${{secrets.KART_SSH_USER}} ansible_become_user=${{secrets.KART_ANSIBLE_BECOME_USER}} ansible_become_password=${{secrets.KART_ANSIBLE_BECOME_PASSWORD}}
         options: |
           --verbose
+  category_service:
+    # needs: check
+    # if: needs.check.outputs.category_service == 'true'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Publish to Registry
+      uses: docker/build-push-action@v2
+      with:
+        context: category_service/
+        push: true
+        tags: theartofdevel/notes_system.category_service:latest
+
+    - name: Deploy APIService
+      uses: dawidd6/action-ansible-playbook@v2
+      with:
+        playbook: deploy.yml
+        directory: category_service/
+        key: ${{secrets.KART_SSH_PRIV_KEY}}
+        inventory: |
+          [all]
+          kartservices.com ansible_ssh_port=${{secrets.KART_SSH_PORT}} ansible_ssh_user=${{secrets.KART_SSH_USER}} ansible_become_user=${{secrets.KART_ANSIBLE_BECOME_USER}} ansible_become_password=${{secrets.KART_ANSIBLE_BECOME_PASSWORD}}
+        options: |
+          --verbose
