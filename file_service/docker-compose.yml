@@ -3,6 +3,7 @@ version: '3.7'
 services:
   minio1:
     image: minio/minio:RELEASE.2021-04-06T23-11-00Z
+    container_name: ns-minio1
     volumes:
       - data1-1:/data1
       - data1-2:/data2
@@ -17,9 +18,9 @@ services:
       interval: 30s
       timeout: 20s
       retries: 3
-
   minio2:
     image: minio/minio:RELEASE.2021-04-06T23-11-00Z
+    container_name: ns-minio2
     volumes:
       - data2-1:/data1
       - data2-2:/data2
@@ -34,9 +35,9 @@ services:
       interval: 30s
       timeout: 20s
       retries: 3
-
   nginx:
     image: nginx:1.19.2-alpine
+    container_name: ns-minio_nginx
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
@@ -44,6 +45,14 @@ services:
     depends_on:
       - minio1
       - minio2
+  file_service:
+    restart: always
+    image: theartofdevel/notes_system.file_service:latest
+    container_name: ns-file_service
+    depends_on:
+      - nginx
+    ports:
+      - 10002:10002
 
 volumes:
   data1-1:

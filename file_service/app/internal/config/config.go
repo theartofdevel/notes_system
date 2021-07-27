@@ -11,7 +11,7 @@ type Config struct {
 	Listen  struct {
 		Type   string `yaml:"type" env-default:"port"`
 		BindIP string `yaml:"bind_ip" env-default:"localhost"`
-		Port   string `yaml:"port" env-default:"8086"`
+		Port   string `yaml:"port" env-default:"10002"`
 	}
 	MinIO struct {
 		Endpoint  string `yaml:"endpoint" env-required:"true"`

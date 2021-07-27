@@ -1,0 +1,34 @@
+---
+- hosts: all
+  gather_facts: true
+  vars:
+    app_path: /opt/notes_system/api_service
+  tasks:
+    - name: "create {{ app_path }}/"
+      file:
+        path: "{{ app_path }}/"
+        state: "directory"
+        owner: "noteadmin"
+        group: "noteadmin"
+        mode: 0775
+      become: yes
+      become_method: sudo
+
+    - name: "copy docker-compose.yml"
+      copy:
+        src: "docker-compose.yml"
+        dest: "{{ app_path }}/docker-compose.yml"
+        owner: "noteadmin"
+        group: "noteadmin"
+        mode: 0644
+      become: yes
+      become_method: sudo
+
+    - name: "stop services"
+      shell: docker-compose -f {{ app_path }}/docker-compose.yml stop
+
+    - name: "pull images"
+      shell: docker-compose -f {{ app_path }}/docker-compose.yml pull
+
+    - name: "start services"
+      shell: docker-compose -f {{ app_path }}/docker-compose.yml up -d
