@@ -4,6 +4,6 @@ services:
   api_service:
     restart: always
     image: theartofdevel/notes_system.api_service:latest
-    container_name: api_service
+    container_name: ns-api_service
     ports:
       - 10000:10000
