@@ -4,12 +4,12 @@ is_debug: true
 listen:
   type: port
   bind_ip: localhost
-  port: 8083
+  port: 10003
 mongodb:
-  host: localhost
+  host: ns-ts-mongodb
   port: 27017
-  username: testadm
-  password: testadm
+  username: nsuser
+  password: nsuser
   auth_db: admin
   database: notes_system
   collection: tags
