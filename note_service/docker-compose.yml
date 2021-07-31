@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  mongodb:
+    image: 'mongo:5.0'
+    container_name: 'ns-ns-mongodb'
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongoadm
+      - MONGO_INITDB_ROOT_PASSWORD=mongoadm
+    volumes:
+      - ./init.js:/docker-entrypoint-initdb.d/init.js:ro
+      - ./mongo-volume:/data/db
+  note_service:
+    restart: always
+    image: theartofdevel/notes_system.note_service:latest
+    container_name: ns-note_service
+    ports:
+      - 10003:10003
