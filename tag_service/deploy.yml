@@ -24,6 +24,16 @@
       become: yes
       become_method: sudo
 
+    - name: "copy init.js"
+      copy:
+        src: "init.js"
+        dest: "{{ app_path }}/init.js"
+        owner: "noteadmin"
+        group: "noteadmin"
+        mode: 0644
+      become: yes
+      become_method: sudo
+
     - name: "stop services"
       shell: docker-compose -f {{ app_path }}/docker-compose.yml stop
 
