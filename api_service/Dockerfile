@@ -1,7 +1,15 @@
-FROM golang:1.16.6-alpine3.14
+FROM golang:1.16.5-alpine3.14 AS builder
+
+WORKDIR /go/src/app
+
 ADD app/ /usr/local/go/src/
 WORKDIR /usr/local/go/src/
+
 RUN go clean --modcache
 RUN go build -o app cmd/main/app.go
 
-CMD ["/usr/local/go/src/app"]
+FROM alpine:3.14
+
+COPY --from=builder /usr/local/go/src/app /
+
+CMD ["/app"]
