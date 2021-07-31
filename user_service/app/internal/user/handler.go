@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
-	"github.com/theartofdevel/notes_system/user_service/internal/appError"
+	"github.com/theartofdevel/notes_system/user_service/internal/apperror"
 	"github.com/theartofdevel/notes_system/user_service/pkg/logging"
 	"net/http"
 )
