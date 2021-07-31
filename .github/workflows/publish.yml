@@ -99,7 +99,7 @@ jobs:
         push: true
         tags: theartofdevel/notes_system.category_service:latest
 
-    - name: Deploy APIService
+    - name: Deploy CategoryService
       uses: dawidd6/action-ansible-playbook@v2
       with:
         playbook: deploy.yml
@@ -130,7 +130,7 @@ jobs:
         push: true
         tags: theartofdevel/notes_system.file_service:latest
 
-    - name: Deploy APIService
+    - name: Deploy FileService
       uses: dawidd6/action-ansible-playbook@v2
       with:
         playbook: deploy.yml
