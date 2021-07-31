@@ -6,6 +6,6 @@ listen:
   bind_ip: localhost
   port: 10002
 minio:
-  endpoint: "ns-minio_nginx:9000"
+  endpoint: "ns-fs-nginx:9000"
   access_key: "minio"
   secret_key: "minio123"
