@@ -141,3 +141,96 @@ jobs:
           kartservices.com ansible_ssh_port=${{secrets.KART_SSH_PORT}} ansible_ssh_user=${{secrets.KART_SSH_USER}} ansible_become_user=${{secrets.KART_ANSIBLE_BECOME_USER}} ansible_become_password=${{secrets.KART_ANSIBLE_BECOME_PASSWORD}}
         options: |
           --verbose
+  note_service:
+    # needs: check
+    # if: needs.check.outputs.note_service == 'true'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Publish to Registry
+      uses: docker/build-push-action@v2
+      with:
+        context: note_service/
+        push: true
+        tags: theartofdevel/notes_system.note_service:latest
+
+    - name: Deploy NoteService
+      uses: dawidd6/action-ansible-playbook@v2
+      with:
+        playbook: deploy.yml
+        directory: note_service/
+        key: ${{secrets.KART_SSH_PRIV_KEY}}
+        inventory: |
+          [all]
+          kartservices.com ansible_ssh_port=${{secrets.KART_SSH_PORT}} ansible_ssh_user=${{secrets.KART_SSH_USER}} ansible_become_user=${{secrets.KART_ANSIBLE_BECOME_USER}} ansible_become_password=${{secrets.KART_ANSIBLE_BECOME_PASSWORD}}
+        options: |
+          --verbose
+  tag_service:
+    # needs: check
+    # if: needs.check.outputs.tag_service == 'true'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Publish to Registry
+      uses: docker/build-push-action@v2
+      with:
+        context: tag_service/
+        push: true
+        tags: theartofdevel/notes_system.tag_service:latest
+
+    - name: Deploy TagService
+      uses: dawidd6/action-ansible-playbook@v2
+      with:
+        playbook: deploy.yml
+        directory: tag_service/
+        key: ${{secrets.KART_SSH_PRIV_KEY}}
+        inventory: |
+          [all]
+          kartservices.com ansible_ssh_port=${{secrets.KART_SSH_PORT}} ansible_ssh_user=${{secrets.KART_SSH_USER}} ansible_become_user=${{secrets.KART_ANSIBLE_BECOME_USER}} ansible_become_password=${{secrets.KART_ANSIBLE_BECOME_PASSWORD}}
+        options: |
+          --verbose
+  user_service:
+    # needs: check
+    # if: needs.check.outputs.user_service == 'true'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Publish to Registry
+      uses: docker/build-push-action@v2
+      with:
+        context: user_service/
+        push: true
+        tags: theartofdevel/notes_system.user_service:latest
+
+    - name: Deploy UserService
+      uses: dawidd6/action-ansible-playbook@v2
+      with:
+        playbook: deploy.yml
+        directory: user_service/
+        key: ${{secrets.KART_SSH_PRIV_KEY}}
+        inventory: |
+          [all]
+          kartservices.com ansible_ssh_port=${{secrets.KART_SSH_PORT}} ansible_ssh_user=${{secrets.KART_SSH_USER}} ansible_become_user=${{secrets.KART_ANSIBLE_BECOME_USER}} ansible_become_password=${{secrets.KART_ANSIBLE_BECOME_PASSWORD}}
+        options: |
+          --verbose
