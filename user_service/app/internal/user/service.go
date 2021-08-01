@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/theartofdevel/notes_system/user_service/internal/appError"
+	"github.com/theartofdevel/notes_system/user_service/internal/apperror"
 	"github.com/theartofdevel/notes_system/user_service/pkg/logging"
 	"golang.org/x/crypto/bcrypt"
 )
