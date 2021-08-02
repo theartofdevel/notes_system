@@ -8,10 +8,10 @@ listen:
   bind_ip: 0.0.0.0
   port: 10000
 category_service:
-  url: http://127.0.0.1:5000/api
+  url: http://ns-category_service:10001/api
 note_service:
-  url: http://127.0.0.1:8081/api
+  url: http://ns-note_service:10003/api
 user_service:
-  url: http://127.0.0.1:8082/api
+  url: http://ns-user_service:10005/api
 tag_service:
-  url: http://127.0.0.1:8083/api
+  url: http://ns-tag_service:10004/api
