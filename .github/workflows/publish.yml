@@ -9,7 +9,7 @@ jobs:
     name: Check changed files
     outputs:
       api_service: ${{ steps.check_files.outputs.api_service }}
-      notes_service: ${{ steps.check_files.outputs.notes_service }}
+      note_service: ${{ steps.check_files.outputs.note_service }}
       category_service: ${{ steps.check_files.outputs.category_service }}
       file_service: ${{ steps.check_files.outputs.file_service }}
       tag_service: ${{ steps.check_files.outputs.tag_service }}
@@ -33,8 +33,8 @@ jobs:
               echo $file
               if [[ $file == api_service/* ]]; then
                 echo "::set-output name=api_service::true"
-              elif [[ $file == notes_service/* ]]; then
-                echo "::set-output name=notes_service::true"
+              elif [[ $file == note_service/* ]]; then
+                echo "::set-output name=note_service::true"
               elif [[ $file == category_service/* ]]; then
                 echo "::set-output name=category_service::true"
               elif [[ $file == file_service/* ]]; then
