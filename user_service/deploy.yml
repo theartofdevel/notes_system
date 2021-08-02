@@ -2,7 +2,7 @@
 - hosts: all
   gather_facts: true
   vars:
-    app_path: /opt/notes_system/note_service
+    app_path: /opt/notes_system/user_service
   tasks:
     - name: "create {{ app_path }}/"
       file:
