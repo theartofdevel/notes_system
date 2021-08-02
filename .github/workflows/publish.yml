@@ -5,52 +5,52 @@ on:
     branches: [ main ]
 
 jobs:
-  # check:
-  #   name: Check changed files
-  #   outputs:
-  #     api_service: ${{ steps.check_files.outputs.api_service }}
-  #     notes_service: ${{ steps.check_files.outputs.notes_service }}
-  #     category_service: ${{ steps.check_files.outputs.category_service }}
-  #     file_service: ${{ steps.check_files.outputs.file_service }}
-  #     tag_service: ${{ steps.check_files.outputs.tag_service }}
-  #     user_service: ${{ steps.check_files.outputs.user_service }}
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v2
-  #       with:
-  #         fetch-depth: 2
+  check:
+    name: Check changed files
+    outputs:
+      api_service: ${{ steps.check_files.outputs.api_service }}
+      notes_service: ${{ steps.check_files.outputs.notes_service }}
+      category_service: ${{ steps.check_files.outputs.category_service }}
+      file_service: ${{ steps.check_files.outputs.file_service }}
+      tag_service: ${{ steps.check_files.outputs.tag_service }}
+      user_service: ${{ steps.check_files.outputs.user_service }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
 
-  #     - name: check modified files
-  #       id: check_files
-  #       run: |
-  #           echo "=============== list modified files ==============="
-  #           git diff --name-only HEAD^ HEAD
+      - name: check modified files
+        id: check_files
+        run: |
+            echo "=============== list modified files ==============="
+            git diff --name-only HEAD^ HEAD
 
-  #           echo "========== check paths of modified files =========="
-  #           git diff --name-only HEAD^ HEAD > files.txt
-  #           while IFS= read -r file; do
-  #             echo $file
-  #             if [[ $file == api_service/* ]]; then
-  #               echo "::set-output name=api_service::true"
-  #             elif [[ $file == notes_service/* ]]; then
-  #               echo "::set-output name=notes_service::true"
-  #             elif [[ $file == category_service/* ]]; then
-  #               echo "::set-output name=category_service::true"
-  #             elif [[ $file == file_service/* ]]; then
-  #               echo "::set-output name=file_service::true"
-  #             elif [[ $file == tag_service/* ]]; then
-  #               echo "::set-output name=tag_service::true"
-  #             elif [[ $file == user_service/* ]]; then
-  #               echo "::set-output name=user_service::true"
-  #             else
-  #               echo "file does not belong to any service"
-  #             fi
-  #           done < files.txt
+            echo "========== check paths of modified files =========="
+            git diff --name-only HEAD^ HEAD > files.txt
+            while IFS= read -r file; do
+              echo $file
+              if [[ $file == api_service/* ]]; then
+                echo "::set-output name=api_service::true"
+              elif [[ $file == notes_service/* ]]; then
+                echo "::set-output name=notes_service::true"
+              elif [[ $file == category_service/* ]]; then
+                echo "::set-output name=category_service::true"
+              elif [[ $file == file_service/* ]]; then
+                echo "::set-output name=file_service::true"
+              elif [[ $file == tag_service/* ]]; then
+                echo "::set-output name=tag_service::true"
+              elif [[ $file == user_service/* ]]; then
+                echo "::set-output name=user_service::true"
+              else
+                echo "file does not belong to any service"
+              fi
+            done < files.txt
 
   api_service:
-    # needs: check
-    # if: needs.check.outputs.api_service == 'true'
+    needs: check
+    if: needs.check.outputs.api_service == 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -80,8 +80,8 @@ jobs:
         options: |
           --verbose
   category_service:
-    # needs: check
-    # if: needs.check.outputs.category_service == 'true'
+    needs: check
+    if: needs.check.outputs.category_service == 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -111,8 +111,8 @@ jobs:
         options: |
           --verbose
   file_service:
-    # needs: check
-    # if: needs.check.outputs.file_service == 'true'
+    needs: check
+    if: needs.check.outputs.file_service == 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -142,8 +142,8 @@ jobs:
         options: |
           --verbose
   note_service:
-    # needs: check
-    # if: needs.check.outputs.note_service == 'true'
+    needs: check
+    if: needs.check.outputs.note_service == 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -173,8 +173,8 @@ jobs:
         options: |
           --verbose
   tag_service:
-    # needs: check
-    # if: needs.check.outputs.tag_service == 'true'
+    needs: check
+    if: needs.check.outputs.tag_service == 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -204,8 +204,8 @@ jobs:
         options: |
           --verbose
   user_service:
-    # needs: check
-    # if: needs.check.outputs.user_service == 'true'
+    needs: check
+    if: needs.check.outputs.user_service == 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
