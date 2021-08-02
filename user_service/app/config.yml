@@ -4,7 +4,7 @@ is_debug: true
 listen:
   type: port
   bind_ip: localhost
-  port: 10004
+  port: 10005
 mongodb:
   host: ns-us-mongodb
   port: 27017
