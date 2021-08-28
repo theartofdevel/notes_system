@@ -5,19 +5,19 @@
 
 # Roadmap
 
-- Create NoteService (done)
-- Implement MongoDB for NoteService (done)
-- Create UserService (done)
-- Implement MongoDB for UserService (done)
-- Create CategoryService (done)
-- Implement Neo4j for CategoryService (done)
-- Create TagService (done)
-- Implement MongoDB for TagService (done)
-- Create APIService (done)
-- Create FileService (done)
-- Implement MinIO for FileService (done)
-- Package to docker containers (done)
-- CI/CD using GitHub Actions (done)
+- ~~Create NoteService~~
+- ~~Implement MongoDB for NoteService~~
+- ~~Create UserService~~
+- ~~Implement MongoDB for UserService~~
+- ~~Create CategoryService~~
+- ~~Implement Neo4j for CategoryService~~
+- ~~Create TagService~~
+- ~~Implement MongoDB for TagService~~
+- ~~Create APIService~~
+- ~~Create FileService~~
+- ~~Implement MinIO for FileService~~
+- ~~Package to docker containers~~
+- ~~CI/CD using GitHub Actions~~
 - Implement Consul (TBD)
 - Implement Zipkin (TBD)
 - Implement ElasticSearch to search Notes (TBD)
