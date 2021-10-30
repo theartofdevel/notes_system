@@ -50,7 +50,7 @@ jobs:
 
   api_service:
     needs: check
-    #if: needs.check.outputs.api_service == 'true'
+    if: needs.check.outputs.api_service == 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -81,7 +81,7 @@ jobs:
           --verbose
   category_service:
     needs: check
-    #if: needs.check.outputs.category_service == 'true'
+    if: needs.check.outputs.category_service == 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -112,7 +112,7 @@ jobs:
           --verbose
   file_service:
     needs: check
-    #if: needs.check.outputs.file_service == 'true'
+    if: needs.check.outputs.file_service == 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -143,7 +143,7 @@ jobs:
           --verbose
   note_service:
     needs: check
-    #if: needs.check.outputs.note_service == 'true'
+    if: needs.check.outputs.note_service == 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -174,7 +174,7 @@ jobs:
           --verbose
   tag_service:
     needs: check
-    #if: needs.check.outputs.tag_service == 'true'
+    if: needs.check.outputs.tag_service == 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -205,7 +205,7 @@ jobs:
           --verbose
   user_service:
     needs: check
-    #if: needs.check.outputs.user_service == 'true'
+    if: needs.check.outputs.user_service == 'true'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
