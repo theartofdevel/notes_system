@@ -3,42 +3,46 @@
   gather_facts: true
   vars:
     app_path: /opt/notes_system/file_service
+    user: "noteadmin"
+    group: "noteadmin"
+    docker_compose_file: "docker-compose.yml"
+    nginx_file: "nginx.conf"
   tasks:
     - name: "create {{ app_path }}/"
       file:
         path: "{{ app_path }}/"
         state: "directory"
-        owner: "noteadmin"
-        group: "noteadmin"
+        owner: "{{ user }}"
+        group: "{{ group }}"
         mode: 0775
       become: yes
       become_method: sudo
 
-    - name: "copy docker-compose.yml"
+    - name: "copy {{ docker_compose_file }}"
       copy:
-        src: "docker-compose.yml"
-        dest: "{{ app_path }}/docker-compose.yml"
-        owner: "noteadmin"
-        group: "noteadmin"
+        src: "{{ docker_compose_file }}"
+        dest: "{{ app_path }}/{{ docker_compose_file }}"
+        owner: "{{ user }}"
+        group: "{{ group }}"
         mode: 0644
       become: yes
       become_method: sudo
 
-    - name: "copy nginx.conf"
+    - name: "copy {{ nginx_file }}"
       copy:
-        src: "nginx.conf"
-        dest: "{{ app_path }}/nginx.conf"
-        owner: "noteadmin"
-        group: "noteadmin"
+        src: "{{ nginx_file }}"
+        dest: "{{ app_path }}/{{ nginx_file }}"
+        owner: "{{ user }}"
+        group: "{{ group }}"
         mode: 0644
       become: yes
       become_method: sudo
 
     - name: "stop services"
-      shell: docker-compose -f {{ app_path }}/docker-compose.yml stop
+      shell: docker-compose -f {{ app_path }}/{{ docker_compose_file }} stop
 
     - name: "pull images"
-      shell: docker-compose -f {{ app_path }}/docker-compose.yml pull
+      shell: docker-compose -f {{ app_path }}/{{ docker_compose_file }} pull
 
     - name: "start services"
-      shell: docker-compose -f {{ app_path }}/docker-compose.yml up -d
+      shell: docker-compose -f {{ app_path }}/{{ docker_compose_file }} up -d
