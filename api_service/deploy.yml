@@ -3,16 +3,16 @@
   gather_facts: true
   vars:
     app_path: /opt/notes_system/api_service
-    user: noteadmin
-    group: noteadmin
+    app_user: noteadmin
+    app_group: noteadmin
     docker_compose_file: docker-compose.yml
   tasks:
     - name: "create {{ app_path }}/"
       file:
         path: "{{ app_path }}/"
         state: "directory"
-        owner: "{{ user }}"
-        group: "{{ group }}"
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
         mode: 0775
       become: yes
       become_method: sudo
@@ -21,8 +21,8 @@
       copy:
         src: "{{ docker_compose_file }}"
         dest: "{{ app_path }}/{{ docker_compose_file }}"
-        owner: "{{ user }}"
-        group: "{{ group }}"
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
         mode: 0644
       become: yes
       become_method: sudo
