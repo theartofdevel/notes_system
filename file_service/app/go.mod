@@ -9,5 +9,4 @@ require (
 	github.com/minio/minio-go/v7 v7.0.10
 	github.com/sirupsen/logrus v1.8.1
 	golang.org/x/text v0.3.3
-	pkg.re/essentialkaos/translit.v2 v2.0.1+incompatible // indirect
 )
